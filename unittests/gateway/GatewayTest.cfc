@@ -14,14 +14,30 @@
    limitations under the License.
  --->
 
-<cfcomponent hint="The applicaiton.cfc for squabble unit tests" output="false">
+<cfimport path="squabble.*">
 
-<cfscript>
-	this.name = "Squabble Unit Tests";
-	this.datasource = "Squabble";
-</cfscript>
+<cfcomponent extends="unittests.AbstractTestCase" output="false">
 
 <!------------------------------------------- PUBLIC ------------------------------------------->
+
+<cffunction name="setup" hint="setup" access="public" returntype="void" output="false">
+	<cfscript>
+		service = new SquabbleGateway();
+    </cfscript>
+</cffunction>
+
+<cffunction name="insertVisitorTest" hint="Tests inserting a new visitor" access="public" returntype="void" output="false">
+	<cftransaction>
+		<cfscript>
+			visitorID = service.insertVisitor(testName="foo");
+			getVisitor = service.getVisitor(visitorID);
+			
+			assertTrue(getVisitor.recordcount EQ 1);
+			assertEquals(visitorID, getVisitor.id);
+	    </cfscript>
+	    <cftransaction action="rollback" />
+    </cftransaction>
+</cffunction>
 
 <!------------------------------------------- PACKAGE ------------------------------------------->
 
