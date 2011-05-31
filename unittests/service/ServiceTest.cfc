@@ -50,6 +50,18 @@
     </cfscript>
 </cffunction>
 
+<cffunction name="testListTests" hint="testing list tests" access="public" returntype="void" output="false">
+	<cfscript>
+		service.registerTest("foo", testConfig, conversionConfigs, 99);
+		service.registerTest("bar", testConfig, conversionConfigs);
+		service.registerTest("yerk", testConfig, conversionConfigs);
+
+		var expected = ["foo", "bar", "yerk"];
+
+		assertArrayEqualsNonOrdered(expected, service.listTests());
+	</cfscript>
+</cffunction>
+
 <!------------------------------------------- PACKAGE ------------------------------------------->
 
 <!------------------------------------------- PRIVATE ------------------------------------------->

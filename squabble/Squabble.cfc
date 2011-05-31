@@ -40,6 +40,10 @@
 	</cfscript>
 </cffunction>
 
+<cffunction name="listTests" hint="list of all test names registered with squabble." access="public" returntype="array" output="false">
+	<cfreturn structKeyArray(getTestConfigurations()) />
+</cffunction>
+
 <!------------------------------------------- PACKAGE ------------------------------------------->
 
 <!------------------------------------------- PRIVATE ------------------------------------------->
