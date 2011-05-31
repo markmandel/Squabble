@@ -182,6 +182,70 @@
     </cfscript>
 </cffunction>
 
+<cffunction name="testDefaultRunTest" hint="test running a given test. (integration test)" access="public" returntype="void" output="false">
+	<cftransaction>
+		<cfscript>
+			service.registerTest("foo", testConfig, conversionConfigs);
+
+			var previousID = "";
+			var previousVar = "";
+			var mod16 = "";
+
+			for(var counter = 1; counter lte 100; counter++)
+			{
+				clearSquabbleCookies();
+
+				service.runTest("foo");
+
+				assertNotEquals(service.getCurrentVisitorID("foo"), previousID, "Counter: #counter#");
+				assertNotEquals(service.getCurrentVariation("foo"), previousID, "Counter: #counter#");
+
+				previousID = service.getCurrentVisitorID("foo");
+				previousVar = service.getCurrentVariation("foo");
+
+				//should loop around every 16, as that is how many variations there are
+				if(counter == 1)
+				{
+					mod16 = previousVar;
+				}
+				else if((counter - 1) % 16 == 0) //every 16th + 1, since not index of 0
+				{
+					assertTrue(mod16.equals(previousVar));
+				}
+			}
+	    </cfscript>
+    	<cftransaction action="rollback" />
+	</cftransaction>
+</cffunction>
+
+<cffunction name="testIsActiveVariation" hint="test running a given test. (integration test)" access="public" returntype="void" output="false">
+	<cftransaction>
+		<cfscript>
+			clearSquabbleCookies();
+
+			service.registerTest("foo", testConfig, conversionConfigs);
+
+			service.runTest("foo");
+
+			//we know control,control should come first
+			assertTrue(service.isActiveVariation("foo", "fooSection", "control"));
+			assertTrue(service.isActiveVariation("foo", "barSection", "control"));
+
+			//get out of the control section
+			for(var counter = 1; counter <= 5; counter++)
+			{
+				clearSquabbleCookies();
+				service.runTest("foo");
+			}
+
+			//should be after control, so these should be false
+			assertFalse(service.isActiveVariation("foo", "fooSection", "control"));
+			assertFalse(service.isActiveVariation("foo", "barSection", "control"));
+	    </cfscript>
+    	<cftransaction action="rollback" />
+	</cftransaction>
+</cffunction>
+
 <!------------------------------------------- PACKAGE ------------------------------------------->
 
 <!------------------------------------------- PRIVATE ------------------------------------------->

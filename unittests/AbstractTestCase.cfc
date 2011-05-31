@@ -19,6 +19,17 @@
 
 <!------------------------------------------- PUBLIC ------------------------------------------->
 
+<cffunction name="clearSquabbleCookies" hint="removes all squabble cookies" access="private" returntype="void" output="false">
+	<cfscript>
+		var cookies = structKeyArray(cookie);
+    </cfscript>
+    <cfloop array="#cookies#" index="key">
+		<cfif LCase(key).startsWith("squabble")>
+			<cfset structDelete(cookie, key)>
+		</cfif>
+    </cfloop>
+</cffunction>
+
 <!--- credit to coldspring abstract test case for this code. --->
 <cffunction name="assertArrayEqualsNonOrdered" hint="Assert that the two arrays are the same, but they don't have to be in the same order" access="private" returntype="void" output="false">
 	<cfargument name="arr1" hint="array1" type="array" required="Yes">
