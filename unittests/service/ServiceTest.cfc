@@ -36,14 +36,18 @@
 
 <cffunction name="registerTestTest" hint="test registering tests (yes, I had as much fun writing that as you did reading it)" access="public" returntype="void" output="false">
 	<cfscript>
-		service.registerTest("foo", testConfig, conversionConfigs, 99);
-
 		var expected = {
 			testname = "foo"
-			,variations = testConfig
+			,variations = StructCopy(testConfig)
 			,conversions = conversionConfigs
 			,percentageVisitorTraffic = 99
 		};
+
+		//add in control
+		expected.variations.barSection[4] = "control";
+		expected.variations.fooSection[4] = "control";
+
+		service.registerTest("foo", testConfig, conversionConfigs, 99);
 
 		//use underlying equals, as built in assertEquals is not great for structs.
 		assertTrue(expected.equals(service.getTestConfigurations().foo));
@@ -64,22 +68,140 @@
 
 <cffunction name="testGetTestConfig" hint="testing getting test config" access="public" returntype="void" output="false">
 	<cfscript>
-		service.registerTest("foo", testConfig, conversionConfigs, 99);
-
 		var expected = {
 			testname = "foo"
-			,variations = testConfig
+			,variations = StructCopy(testConfig)
 			,conversions = conversionConfigs
 			,percentageVisitorTraffic = 99
 		};
+
+		//add in control
+		expected.variations.barSection[4] = "control";
+		expected.variations.fooSection[4] = "control";
+
+		service.registerTest("foo", testConfig, conversionConfigs, 99);
 
 		//use underlying equals, as built in assertEquals is not great for structs.
 		assertTrue(expected.equals(service.getTestConfig("foo")));
 	</cfscript>
 </cffunction>
 
+<cffunction name="testCombinations" hint="test all the combinations are accounted for" access="public" returntype="void" output="false">
+	<cfscript>
+		//test the number of combinations are right, and that they are all different, therefore they will all be there.
+
+
+		//test 1 levels
+		var myTestConfig = duplicate(testConfig);
+		StructDelete(myTestConfig, "fooSection");
+
+		service.registerTest("bar", myTestConfig, conversionConfigs);
+		var combinations = service.listTestCombinations("bar");
+
+		var comboNumber = 4; //control +1
+		assertEquals(comboNumber, ArrayLen(combinations));
+
+		//sort by natural order, makes checking for duplicates easy.
+		textCombinations = convertCombinationsToStrings(combinations);
+		ArraySort(textCombinations, "text" );
+
+		var len = ArrayLen(combinations);
+
+        for(var counter=2; counter <= len; counter++)
+        {
+        	var combo = textCombinations[local.counter];
+        	var previous = textCombinations[local.counter - 1];
+
+        	if(combo.equals(previous))
+        	{
+        		debug(combinations);
+        		debug(textCombinations);
+        		fail("Two combinations are the same!");
+
+        	}
+        }
+
+
+		//test 2 levels next
+		service.registerTest("foo", duplicate(testConfig), conversionConfigs, 99);
+		var combinations = service.listTestCombinations("foo");
+
+		var comboNumber = 4 * 4; //control +1
+		assertEquals(comboNumber, ArrayLen(combinations));
+
+		//sort by natural order, makes checking for duplicates easy.
+		textCombinations = convertCombinationsToStrings(combinations);
+		ArraySort(textCombinations, "text" );
+
+		var len = ArrayLen(combinations);
+
+        for(var counter=2; counter <= len; counter++)
+        {
+        	var combo = textCombinations[local.counter];
+        	var previous = textCombinations[local.counter - 1];
+
+        	if(combo.equals(previous))
+        	{
+        		debug(combinations);
+        		debug(textCombinations);
+        		fail("Two combinations are the same!");
+        	}
+        }
+
+		//let's do 3 levels next.
+		myTestConfig = duplicate(testConfig);
+		myTestConfig.gandalf = [ "test7", "test8", "test9", "test10" ];
+
+		service.registerTest("gandalf", myTestConfig, conversionConfigs);
+
+		var combinations = service.listTestCombinations("gandalf");
+
+
+		var comboNumber = 4 * 4 * 5; //control +1
+		assertEquals(comboNumber, ArrayLen(combinations));
+
+		//sort by natural order, makes checking for duplicates easy.
+		textCombinations = convertCombinationsToStrings(combinations);
+		ArraySort(textCombinations, "text" );
+
+		var len = ArrayLen(combinations);
+        for(var counter=2; counter <= len; counter++)
+        {
+        	var combo = textCombinations[local.counter];
+        	var previous = textCombinations[local.counter - 1];
+
+        	if(combo.equals(previous))
+        	{
+        		debug(combinations);
+        		debug(textCombinations);
+        		fail("Two combinations are the same!");
+        	}
+        }
+    </cfscript>
+</cffunction>
+
 <!------------------------------------------- PACKAGE ------------------------------------------->
 
 <!------------------------------------------- PRIVATE ------------------------------------------->
+
+<cffunction name="convertCombinationsToStrings" hint="" access="private" returntype="array" output="false">
+	<cfargument name="combinations" hint="array of combos" type="array" required="Yes">
+	<cfscript>
+		var newCombos = [];
+
+		for(var item in arguments.combinations)
+		{
+			string = "";
+			for(var key in item)
+			{
+				string = listAppend(string,key);
+				string = listAppend(string,item[key]);
+			}
+			arrayAppend(newCombos, string);
+		}
+
+		return newCombos;
+    </cfscript>
+</cffunction>
 
 </cfcomponent>
