@@ -62,6 +62,22 @@
 	</cfscript>
 </cffunction>
 
+<cffunction name="testGetTestConfig" hint="testing getting test config" access="public" returntype="void" output="false">
+	<cfscript>
+		service.registerTest("foo", testConfig, conversionConfigs, 99);
+
+		var expected = {
+			testname = "foo"
+			,variations = testConfig
+			,conversions = conversionConfigs
+			,percentageVisitorTraffic = 99
+		};
+
+		//use underlying equals, as built in assertEquals is not great for structs.
+		assertTrue(expected.equals(service.getTestConfig("foo")));
+	</cfscript>
+</cffunction>
+
 <!------------------------------------------- PACKAGE ------------------------------------------->
 
 <!------------------------------------------- PRIVATE ------------------------------------------->

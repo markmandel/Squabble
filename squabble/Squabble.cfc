@@ -44,6 +44,11 @@
 	<cfreturn structKeyArray(getTestConfigurations()) />
 </cffunction>
 
+<cffunction name="getTestConfig" hint="get a specific test configuration" access="public" returntype="struct" output="false">
+	<cfargument name="testname" hint="the name of the test to get the configuration for." type="string" required="Yes">
+	<cfreturn structFind(getTestConfigurations(), arguments.testname) />
+</cffunction>
+
 <!------------------------------------------- PACKAGE ------------------------------------------->
 
 <!------------------------------------------- PRIVATE ------------------------------------------->
