@@ -40,7 +40,7 @@
 	<cfscript>
 		for(var section in arguments.variations)
 		{
-			ArrayAppend(arguments.variations[section], "control");
+			ArrayPrepend(arguments.variations[section], "control");
 		}
 
 		structInsert(getTestConfigurations(), arguments.testName, arguments);

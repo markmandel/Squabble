@@ -44,8 +44,8 @@
 		};
 
 		//add in control
-		expected.variations.barSection[4] = "control";
-		expected.variations.fooSection[4] = "control";
+		ArrayPrepend(expected.variations.barSection, "control");
+		ArrayPrepend(expected.variations.fooSection, "control");
 
 		service.registerTest("foo", testConfig, conversionConfigs, 99);
 
@@ -76,8 +76,8 @@
 		};
 
 		//add in control
-		expected.variations.barSection[4] = "control";
-		expected.variations.fooSection[4] = "control";
+		ArrayPrepend(expected.variations.barSection, "control");
+		ArrayPrepend(expected.variations.fooSection, "control");
 
 		service.registerTest("foo", testConfig, conversionConfigs, 99);
 
@@ -125,6 +125,8 @@
 		//test 2 levels next
 		service.registerTest("foo", duplicate(testConfig), conversionConfigs, 99);
 		var combinations = service.listTestCombinations("foo");
+
+		debug(combinations);
 
 		var comboNumber = 4 * 4; //control +1
 		assertEquals(comboNumber, ArrayLen(combinations));
