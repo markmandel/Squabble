@@ -23,11 +23,17 @@
 
 	<cfif thisTag.executionMode eq "end">
 
-		<!--- Find the variation for the current section... --->
-		<cfset sectionVariation = testData.currentVariations[attributes.name] />
+		<!--- Find the combination for the current section... --->
+		<cfif structKeyExists(testData.currentCombination, attributes.name)>
+			<cfset sectionVariation = testData.currentCombination[attributes.name] />
+		<!--- If not found, default to control. --->
+		<cfelse>
+			<cfset sectionVariation = "control" />
+		</cfif>
+
 		<cfset sectionContent = "" />
 
-		<!--- then find the content that matches that variation name. --->
+		<!--- Then find the content that matches that variation name. --->
 		<cfloop array="#thisTag.variationData#" index="variation">
 			<cfif variation.name eq sectionVariation>
 				<cfset sectionContent = variation.tagContent />

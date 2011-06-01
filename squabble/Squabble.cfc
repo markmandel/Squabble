@@ -65,7 +65,7 @@ TODO:
 	</cfscript>
 </cffunction>
 
-<cffunction name="runTest" hint="This method needs to be run before calling 'getCurrentVariation'. It sets up the cookie and variation information for the current user,
+<cffunction name="runTest" hint="This method needs to be run before calling 'getCurrentCombination'. It sets up the cookie and variation information for the current user,
 									if it doesn't exist."
 			access="public" returntype="void" output="false">
 	<cfargument name="testName" hint="the name of the test." type="string" required="Yes">
@@ -121,7 +121,7 @@ TODO:
     </cfscript>
 </cffunction>
 
-<cffunction name="getCurrentVariation" hint="get the current visitor variation" access="public" returntype="struct" output="false">
+<cffunction name="getCurrentCombination" hint="get the current visitor variation" access="public" returntype="struct" output="false">
 	<cfargument name="testname" hint="the name of the test to get the variations for." type="string" required="Yes">
 	<cfscript>
 		if(!isCookiesEnabled())
@@ -138,14 +138,14 @@ TODO:
 	<cfargument name="section" hint="the name of the section to check if it is active" type="string" required="Yes">
 	<cfargument name="variation" hint="the name of the variation to check if it is active" type="string" required="Yes">
 	<cfscript>
-		var currentVariation = getCurrentVariation(arguments.testName);
+		var currentCombination = getCurrentCombination(arguments.testName);
 
-		if(!structKeyExists(currentVariation, arguments.section))
+		if(!structKeyExists(currentCombination, arguments.section))
 		{
 			return false;
 		}
 
-		return (currentVariation[arguments.section] == arguments.variation);
+		return (currentCombination[arguments.section] == arguments.variation);
     </cfscript>
 </cffunction>
 

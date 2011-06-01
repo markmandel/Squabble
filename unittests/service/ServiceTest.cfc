@@ -198,10 +198,10 @@
 				service.runTest("foo");
 
 				assertNotEquals(service.getCurrentVisitorID("foo"), previousID, "Counter: #counter#");
-				assertNotEquals(service.getCurrentVariation("foo"), previousID, "Counter: #counter#");
+				assertNotEquals(service.getCurrentCombination("foo"), previousID, "Counter: #counter#");
 
 				previousID = service.getCurrentVisitorID("foo");
-				previousVar = service.getCurrentVariation("foo");
+				previousVar = service.getCurrentCombination("foo");
 
 				//should loop around every 16, as that is how many variations there are
 				if(counter == 1)
