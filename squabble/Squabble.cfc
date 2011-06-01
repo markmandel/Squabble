@@ -23,14 +23,6 @@
 
 <!------------------------------------------- PUBLIC ------------------------------------------->
 
-<!---
-TODO:
-	batch round robin'ing (i.e. in blocks of 5 or 10 for better performance)
-	convert()
-	previewing
-	Some basic reports
- --->
-
 <cffunction name="init" hint="Constructor" access="public" returntype="Squabble" output="false">
 	<cfscript>
 		setTestConfigurations({});

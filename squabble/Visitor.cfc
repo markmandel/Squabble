@@ -15,6 +15,19 @@
  --->
 <cfcomponent hint="Class that manages Visitor identity" output="false">
 
+<cfscript>
+	//contants
+	meta = getMetadata(this);
+
+	if(!structKeyExists(meta, "const"))
+	{
+		const = {};
+		const.PREVIEW_KEY = "squabble_enable_preview";
+
+		meta.const = const;
+	}
+</cfscript>
+
 <!------------------------------------------- PUBLIC ------------------------------------------->
 
 <cffunction name="init" hint="Constructor" access="public" returntype="Visitor" output="false">
@@ -69,6 +82,11 @@
 			return {};
 		}
 
+		if(structKeyExists(url, meta.const.PREVIEW_KEY) && url.squabble_enable_preview eq arguments.testName)
+		{
+			return getPreviewCombination();
+		}
+
 		return deserializeJSON(cookie[createTestCombinationCookieKey(arguments.testName)]);
     </cfscript>
 </cffunction>
@@ -83,6 +101,25 @@
 
 <!------------------------------------------- PRIVATE ------------------------------------------->
 
+<cffunction name="getPreviewCombination" hint="returns a preview combination" access="public" returntype="struct" output="false">
+	<cfscript>
+		var combination = {};
+		//have to use duplicate, or URL scope goes all wonky.
+		var urlCopy = duplicate(url);
+
+		structDelete(urlCopy, meta.const.PREVIEW_KEY);
+
+		for(var key in urlCopy)
+		{
+			if(lcase(key).startsWith("squabble_"))
+			{
+				combination[replaceNoCase(key, "squabble_", "")] = urlCopy[key];
+			}
+		}
+
+		return combination;
+    </cfscript>
+</cffunction>
 
 <!--- cache em, so as not to be creating tons of strings all the time --->
 
