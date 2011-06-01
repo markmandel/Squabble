@@ -40,9 +40,31 @@
     </cfscript>
 </cffunction>
 
+<cffunction name="onRequestStart" hint="request start event handler" returnType="boolean" output="false">
+    <cfargument type="String" name="targetPage" required=true/>
+
+	<cfif structKeyExists(url, "resetCookies")>
+		<cfset clearSquabbleCookies()>
+	</cfif>
+
+    <cfreturn true>
+</cffunction>
+
+
 
 <!------------------------------------------- PACKAGE ------------------------------------------->
 
 <!------------------------------------------- PRIVATE ------------------------------------------->
+
+<cffunction name="clearSquabbleCookies" hint="removes all squabble cookies" access="private" returntype="void" output="false">
+	<cfscript>
+		var cookies = structKeyArray(cookie);
+    </cfscript>
+    <cfloop array="#cookies#" index="key">
+		<cfif LCase(key).startsWith("squabble")>
+			<cfset structDelete(cookie, key)>
+		</cfif>
+    </cfloop>
+</cffunction>
 
 </cfcomponent>
