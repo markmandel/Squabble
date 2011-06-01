@@ -56,24 +56,26 @@
     </cftransaction>
 </cffunction>
 
+
 <cffunction name="insertConversionTest" hint="Tests inserting a conversions for a visitor" access="public" returntype="void" output="false">
 	<cftransaction>
 		<cfscript>
 			// Visitor with 1 conversion
 			var expectedDate = dateAdd("d", -1, now());
 			var visitorID = service.insertVisitor("foo", variationData);
-			service.insertConversion(visitorID, 2.2, expectedDate);
+			service.insertConversion(visitorID, "Credit Card Checkout", 2.2, expectedDate);
 			var conversions = service.getVisitorConversions(visitorID);
 			assertTrue(conversions.recordcount EQ 1);
 			assertEquals(visitorID, conversions.visitor_id);
 			assertEquals(2.2, conversions.conversion_revenue);
+			assertEquals("Credit Card Checkout", conversions.conversion_name);
 			assertEquals(expectedDate, parseDateTime(conversions.conversion_date));
 
-			// Visitor with 3 conversion
+			// Visitor with 3 conversions
 			visitorID = service.insertVisitor("bar", variationData);
-			service.insertConversion(visitorID, 2.2);
-			service.insertConversion(visitorID, 24);
-			service.insertConversion(visitorID, 9.63);
+			service.insertConversion(visitorID, "Credit Card Checkout", 2.2);
+			service.insertConversion(visitorID, "PayPal Checkout", 24);
+			service.insertConversion(visitorID, "Credit Card Checkout", 9.63);
 			conversions = service.getVisitorConversions(visitorID);
 
 			var expected = [2.2,24.0,9.63];

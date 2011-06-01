@@ -246,6 +246,46 @@
 	</cftransaction>
 </cffunction>
 
+<cffunction name="testRunVisitorInsertionTest" hint="Ensure the runTest methods correctly inserts the visitor to the database" access="public" returntype="void" output="false">
+	<cftransaction>
+		<cfscript>
+			clearSquabbleCookies();
+
+			service.registerTest("foo", testConfig, conversionConfigs);
+			service.runTest("foo");
+
+			var visitorID = service.getCurrentVisitorID("foo");
+			var combinations = service.getCurrentCombination("foo");
+
+			var visitorQuery = service.getGateway().getVisitor(visitorID);
+			assertEquals(1, visitorQuery.recordcount);
+
+			var variationsQuery = service.getGateway().getVisitorCombinations(visitorID);
+			assertEquals(2, variationsQuery.recordcount);
+	    </cfscript>
+	    <cftransaction action="rollback" />
+	</cftransaction>
+</cffunction>
+
+<cffunction name="convertTest" hint="Ensures the convert method correctly inserts a conversion record" access="public" returntype="void" output="false">
+	<cftransaction>
+		<cfscript>
+			clearSquabbleCookies();
+
+			service.registerTest("foo", testConfig, conversionConfigs);
+			service.runTest("foo");
+			service.convert("foo", "PayPal Checkout", 12);
+
+			var conversion = service.getGateway().getVisitorConversions(service.getCurrentVisitorID("foo"));
+
+			assertEquals(1, conversion.recordcount);
+			assertEquals("PayPal Checkout", conversion.conversion_name);
+			assertEquals(12, conversion.conversion_revenue);
+	    </cfscript>
+	    <cftransaction action="rollback" />
+	</cftransaction>
+</cffunction>
+
 <cffunction name="testPercentageVisitors" hint="test for percentage of visitors" access="public" returntype="void" output="false">
 	<cftransaction>
 		<cfscript>
