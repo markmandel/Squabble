@@ -14,7 +14,7 @@
    limitations under the License.
  --->
 
-<cfcomponent hint="The Application.cfc for squabble unit tests" output="false">
+<cfcomponent hint="The Application.cfc for the squabble examples" output="false">
 
 <cfscript>
 	this.name = "Squabble Demo Application";
