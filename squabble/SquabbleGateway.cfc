@@ -73,7 +73,7 @@
 </cffunction>
 
 
-<cffunction name="getVisitor" hint="Returns a visitor query" access="public" returntype="query" output="false">
+<cffunction name="getVisitor" hint="Returns a visitor record from the database" access="public" returntype="query" output="false">
 	<cfargument name="visitorID" type="string" required="true" hint="ID of the visitor to return">
 	<cfset var getVisitorQuery = "">
 
@@ -107,7 +107,7 @@
 </cffunction>
 
 
-<cffunction name="insertConversion" hint="Inserts a visitor to the database when they come across a test" access="public" returntype="string" output="false">
+<cffunction name="insertConversion" hint="Records a conversion for a visitor" access="public" returntype="string" output="false">
 	<cfargument name="visitorID" type="string" required="true" hint="The visitor ID to record the conversion for">
 	<cfargument name="conversionRevenue" type="string" required="false" default="" hint="The revenue amount to record for this conversion">
 	<cfargument name="conversionDate" type="date" required="false" default="#now()#" hint="The date the conversion happened">
@@ -133,7 +133,7 @@
 
 
 <cffunction name="getVisitorConversions" hint="Returns a query of conversions for a given visitor" access="public" returntype="query" output="false">
-	<cfargument name="visitorID" type="string" required="true" hint="The visitor ID to record the conversion for">
+	<cfargument name="visitorID" type="string" required="true" hint="ID of the visitor to return conversions for">
 	<cfset var getVisitorConversionsQuery = "">
 
 	<cfquery name="getVisitorConversionsQuery">
