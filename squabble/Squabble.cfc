@@ -134,6 +134,12 @@
 			return;
 		}
 
+		//or if they have been skipped over.
+		if(structIsEmpty(getCurrentCombination(arguments.testName)))
+		{
+			return;
+		}
+
 		getGateway().insertConversion(getCurrentVisitorID(arguments.testname), arguments.conversionName, arguments.revenue);
 	</cfscript>
 </cffunction>
