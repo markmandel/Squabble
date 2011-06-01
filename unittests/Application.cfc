@@ -19,6 +19,7 @@
 <cfscript>
 	this.name = "Squabble Unit Tests";
 	this.datasource = "Squabble";
+	this.sessionManagement = true;
 </cfscript>
 
 <!------------------------------------------- PUBLIC ------------------------------------------->
