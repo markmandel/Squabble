@@ -94,7 +94,9 @@
 <cffunction name="isEnabled" hint="Whether or not we can track this user. At the moment this defaults to whether or not cookies are enabled.
 			<br/>Credits to Alex Baban for his cflib udf 'isCookiesEnabled'"
 			access="public" returntype="boolean" output="false">
-	<cfreturn IsBoolean(URLSessionFormat("True")) />
+	<!---<cfreturn IsBoolean(URLSessionFormat("True")) />--->
+	<!--- for now, just assume cookies, not sure what else to do about it --->
+	<cfreturn true />
 </cffunction>
 
 <!------------------------------------------- PACKAGE ------------------------------------------->

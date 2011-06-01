@@ -19,7 +19,6 @@
 <cfscript>
 	this.name = "Squabble Demo Application";
 	this.datasource = "Squabble";
-	this.sessionManagement = true;
 </cfscript>
 
 <!------------------------------------------- PUBLIC ------------------------------------------->
