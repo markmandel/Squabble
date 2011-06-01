@@ -17,11 +17,29 @@
 <cfcomponent hint="The Application.cfc for squabble unit tests" output="false">
 
 <cfscript>
-	this.name = "Squabble Unit Tests";
+	this.name = "Squabble Demo Application";
 	this.datasource = "Squabble";
 </cfscript>
 
 <!------------------------------------------- PUBLIC ------------------------------------------->
+<cffunction name="onApplicationStart" hint="runs when the application is initialized" access="public" returntype="void" output="false">
+	<cfscript>
+		import "squabble.*";
+
+		application.squabble = new Squabble();
+
+		testConfig =
+			{
+				fooSection = [ "test1", "test2", "test3" ]
+				, barSection = [ "test4", "test5", "test6" ]
+			};
+
+		conversionConfigs = ["conversion1", "conversion2"];
+
+		application.squabble.registerTest("foo", testConfig, conversionConfigs);
+    </cfscript>
+</cffunction>
+
 
 <!------------------------------------------- PACKAGE ------------------------------------------->
 
