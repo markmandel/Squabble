@@ -89,19 +89,19 @@
 <cffunction name="noSectionTest" hint="test tag functionality for a user whose cookie is missing a test section" access="public" returntype="void" output="false">
 	<cftransaction>
 		<cfscript>
-			clearSquabbleCookies();
+			//mock out the response we want
+			var visitor = mock(service.getVisitor());
+
+			visitor.isEnabled().returns(true);
+			visitor.hasID("foo").returns(true);
+			visitor.getCombination().returns({ barSection = "test4" });
+			service.setVisitor(visitor);
 
 			service.registerTest("foo", testConfig, conversionConfigs);
 			service.runTest("foo");
 
 			var expectedFooContent = "control content";
 			var fooContent = "";
-
-			var cookies = structKeyArray(cookie);
-			var cookieName = service.createTestVariationCookieKey("foo");
-			var cookieValue = { barSection = "test4" };
-
-			cookie[cookieName] = serializeJSON(cookieValue);
 		</cfscript>
 
 		<cfimport prefix="squabble" taglib="/squabble/tags" />

@@ -19,6 +19,7 @@
 <cfproperty name="testConfigurations" type="struct" />
 <cfproperty name="testCombinations" type="struct" />
 <cfproperty name="gateway" type="any">
+<cfproperty name="visitor" type="any">
 
 <!------------------------------------------- PUBLIC ------------------------------------------->
 
@@ -37,6 +38,7 @@ TODO:
 		setTestVariationPool({});
 
 		setGateway(new SquabbleGateway());
+		setVisitor(new Visitor());
 
 		return this;
 	</cfscript>
@@ -70,25 +72,21 @@ TODO:
 	<cfargument name="testName" hint="the name of the test." type="string" required="Yes">
 	<cfscript>
 		//escape out if no cookies
-		if(!isCookiesEnabled())
+		if(!getVisitor().isEnabled())
 		{
 			return;
 		}
-
-		var idKey = createTestIDCookieKey(arguments.testName);
 
 		//make it easier for testing, as deleting a cookie just makes it an empty string, rather than removing the key.
-		if(structKeyExists(cookie, idKey) AND Len(cookie[idkey]))
+		if(getVisitor().hasID(arguments.testName))
 		{
 			return;
 		}
-
-		var variationKey = createTestVariationCookieKey(arguments.testName);
 
 		//do percentage of visitor traffic
 		if(isVisitorInPercentage(arguments.testName))
 		{
-			var variation = getNextVariation(arguments.testName);
+			var variation = getNextCombination(arguments.testName);
 			var id = getGateway().insertVisitor(arguments.testName, variation);
 		}
 		else
@@ -97,11 +95,10 @@ TODO:
 			var variation = {};
 			var id = createUUID();
 		}
-    </cfscript>
 
-    <!--- if your test is still running in 6 months, something is wrong --->
-    <cfcookie name="#idkey#" value="#id#" expires="183">
-    <cfcookie name="#variationKey#" value="#serializeJSON(variation)#" expires="183">
+		getVisitor().setID(arguments.testName, id);
+		getVisitor().setCombination(arguments.testName, variation);
+    </cfscript>
 </cffunction>
 
 <cffunction name="listTests" hint="list of all test names registered with squabble." access="public" returntype="array" output="false">
@@ -116,30 +113,6 @@ TODO:
 <cffunction name="listTestCombinations" hint="get all the combinations for all sections and variations for a given test" access="public" returntype="array" output="false">
 	<cfargument name="testname" hint="the name of the test to get the combinations for." type="string" required="Yes">
 	<cfreturn structFind(getTestCombinations(), arguments.testname) />
-</cffunction>
-
-<cffunction name="getCurrentVisitorID" hint="get the current visitor ID" access="public" returntype="string" output="false">
-	<cfargument name="testname" hint="the name of the test to get the combinations for." type="string" required="Yes">
-	<cfscript>
-		if(!isCookiesEnabled())
-		{
-			return "";
-		}
-
-		return cookie[createTestIDCookieKey(arguments.testName)];
-    </cfscript>
-</cffunction>
-
-<cffunction name="getCurrentCombination" hint="get the current visitor combination. If an inactive visitor, returns an empty struct." access="public" returntype="struct" output="false">
-	<cfargument name="testname" hint="the name of the test to get the variations for." type="string" required="Yes">
-	<cfscript>
-		if(!isCookiesEnabled())
-		{
-			return {};
-		}
-
-		return deserializeJSON(cookie[createTestVariationCookieKey(arguments.testName)]);
-    </cfscript>
 </cffunction>
 
 <cffunction name="isActiveVariation" hint="Convenience method to check if a specific variation is active for the current visitor" access="public" returntype="boolean" output="false">
@@ -167,6 +140,16 @@ TODO:
 	</cfscript>
 </cffunction>
 
+<cffunction name="getCurrentVisitorID" hint="get the current visitor ID" access="public" returntype="string" output="false">
+	<cfargument name="testname" hint="the name of the test to get the combinations for." type="string" required="Yes">
+	<cfreturn getVisitor().getID(arguments.testName) />
+</cffunction>
+
+<cffunction name="getCurrentCombination" hint="get the current visitor combination. If an inactive visitor, returns an empty struct." access="public" returntype="struct" output="false">
+	<cfargument name="testname" hint="the name of the test to get the variations for." type="string" required="Yes">
+	<cfreturn getVisitor().getCombination(arguments.testName) />
+</cffunction>
+
 <!------------------------------------------- PACKAGE ------------------------------------------->
 
 <!------------------------------------------- PRIVATE ------------------------------------------->
@@ -185,7 +168,7 @@ TODO:
     </cfscript>
 </cffunction>
 
-<cffunction name="getNextVariation" hint="gets the next variation in the pool for this test" access="private" returntype="struct" output="false">
+<cffunction name="getNextCombination" hint="gets the next combination of variations in the pool for this test" access="private" returntype="struct" output="false">
 	<cfargument name="testname" hint="the name of the test to get the variation for." type="string" required="Yes">
 	<cflock timeout="30" name="squabble.getNextVariation.#arguments.testname#">
 		<cfscript>
@@ -197,22 +180,12 @@ TODO:
 			{
 				pool[arguments.testname] = 1;
 				//go back around
-				return getNextVariation(arguments.testName);
+				return getNextCombination(arguments.testName);
 			}
 
 			return combinations[index];
         </cfscript>
 	</cflock>
-</cffunction>
-
-<cffunction name="createTestIDCookieKey" hint="create the key for the cookie, that stores the current users id" access="public" returntype="string" output="false">
-	<cfargument name="testName" hint="the name of the test." type="string" required="Yes">
-	<cfreturn "squabble-#hash(arguments.testName)#-id" />
-</cffunction>
-
-<cffunction name="createTestVariationCookieKey" hint="create the key for the cookie, that stores the current users variation" access="public" returntype="string" output="false">
-	<cfargument name="testName" hint="the name of the test." type="string" required="Yes">
-	<cfreturn "squabble-#hash(arguments.testName)#-v" />
 </cffunction>
 
 <cffunction name="calculateCombinations" hint="calculate all the combinations of a given test, into an array that can be looped through." access="public" returntype="void" output="false">
@@ -268,20 +241,6 @@ TODO:
 		structInsert(getTestCombinations(), arguments.testName, list);
     </cfscript>
 </cffunction>
-
-<cfscript>
-	/**
-	 * Returns true if browser cookies are enabled.
-	 *
-	 * @return Returns a boolean.
-	 * @author Alex Baban (alexbaban@gmail.com)
-	 * @version 1, March 13, 2009
-	 */
-	private function isCookiesEnabled()
-	{
-	    return IsBoolean(URLSessionFormat("True"));
-	}
-</cfscript>
 
 <!--- made this private, as I *really* don't want people touching this --->
 <cffunction name="getTestVariationPool" access="private" returntype="struct" output="false">
