@@ -1,4 +1,4 @@
-﻿<!---
+<!---
    Copyright 2011 Ezra Parker, Josh Wines, Mark Mandel
 
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,19 +12,22 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
- --->
+ ---><cfsilent>
 
-<cfcomponent hint="The Application.cfc for squabble unit tests" output="false">
+	<!--- This is the child custom tag used to define variations for a section. --->
 
-<cfscript>
-	this.name = "Squabble Unit Tests";
-	this.datasource = "Squabble";
-</cfscript>
+	<cfparam name="attributes.name" type="string" /> <!--- The name of the variation. --->
 
-<!------------------------------------------- PUBLIC ------------------------------------------->
+	<cfif thisTag.executionMode eq "end">
 
-<!------------------------------------------- PACKAGE ------------------------------------------->
+		<!--- Set the variation content into the attributes scope to pass back to the parent tag. --->
+		<cfset attributes.tagContent = thisTag.generatedContent />
 
-<!------------------------------------------- PRIVATE ------------------------------------------->
+		<cfassociate basetag="cf_section" datacollection="variationData" />
 
-</cfcomponent>
+		<!--- Reset generatedContent to control excessive whitespace. --->
+		<cfset thisTag.generatedContent = "" />
+
+	</cfif>
+
+</cfsilent>
