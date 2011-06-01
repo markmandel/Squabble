@@ -128,6 +128,12 @@
 	<cfargument name="conversionName" hint="The name/type of this conversion" type="string" required="false" default="The name of this conversion">
 	<cfargument name="revenue" hint="The revenue amount to record for this conversion" type="string" required="false" default="">
 	<cfscript>
+		//if for whatever reason they don't have an id, ignore them.
+		if(!getVisitor().hasID(arguments.testName))
+		{
+			return;
+		}
+
 		getGateway().insertConversion(getCurrentVisitorID(arguments.testname), arguments.conversionName, arguments.revenue);
 	</cfscript>
 </cffunction>
