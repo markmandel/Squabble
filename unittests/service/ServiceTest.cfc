@@ -246,6 +246,40 @@
 	</cftransaction>
 </cffunction>
 
+<cffunction name="testPercentageVisitors" hint="test for percentage of visitors" access="public" returntype="void" output="false">
+	<cftransaction>
+		<cfscript>
+			service.registerTest("foo", testConfig, conversionConfigs, "50");
+			var active = 0;
+			var inactive = 0;
+
+			for(var counter = 1; counter lte 1000; counter++)
+			{
+				clearSquabbleCookies();
+				service.runTest("foo");
+
+				if(structIsEmpty(service.getCurrentCombination("foo")))
+				{
+					inactive++;
+				}
+				else
+				{
+					active++;
+				}
+			}
+
+			//to test, let's round up to the nearest 100 to make sure this is about accurate enough.
+			active /= 100;
+			inactive /= 100;
+
+			assertEquals(Round(active), Round(inactive));
+
+			debug(active); debug(inactive);
+	    </cfscript>
+    	<cftransaction action="rollback" />
+	</cftransaction>
+</cffunction>
+
 <!------------------------------------------- PACKAGE ------------------------------------------->
 
 <!------------------------------------------- PRIVATE ------------------------------------------->
