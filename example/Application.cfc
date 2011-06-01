@@ -47,6 +47,13 @@
 		<cfset clearSquabbleCookies()>
 	</cfif>
 
+	<cfif structKeyExists(url, "resetApp")>
+		<cfscript>
+			applicationStop();
+			location(".");
+        </cfscript>
+	</cfif>
+
     <cfreturn true>
 </cffunction>
 
