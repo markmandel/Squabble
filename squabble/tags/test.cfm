@@ -32,8 +32,8 @@
 		<!--- Initialize the test. --->
 		<cfset squabble.runTest(attributes.name) />
 
-		<!--- Get the variations for the current visitor. --->
-		<cfset currentVariations = squabble.getCurrentVariation(attributes.name) />
+		<!--- Get the combination for the current visitor. --->
+		<cfset currentCombination = squabble.getCurrentCombination(attributes.name) />
 
 	</cfif>
 

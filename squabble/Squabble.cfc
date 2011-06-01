@@ -25,7 +25,6 @@
 <!---
 TODO:
 	batch round robin'ing (i.e. in blocks of 5 or 10 for better performance)
-	make percentage variation work
 	convert()
 	previewing
 	Some basic reports
@@ -65,7 +64,7 @@ TODO:
 	</cfscript>
 </cffunction>
 
-<cffunction name="runTest" hint="This method needs to be run before calling 'getCurrentVariation'. It sets up the cookie and variation information for the current user,
+<cffunction name="runTest" hint="This method needs to be run before calling 'getCurrentCombination'. It sets up the cookie and variation information for the current user,
 									if it doesn't exist."
 			access="public" returntype="void" output="false">
 	<cfargument name="testName" hint="the name of the test." type="string" required="Yes">
@@ -85,9 +84,19 @@ TODO:
 		}
 
 		var variationKey = createTestVariationCookieKey(arguments.testName);
-		var variation = getNextVariation(arguments.testName);
 
-		var id = getGateway().insertVisitor(arguments.testName, variation);
+		//do percentage of visitor traffic
+		if(isVisitorInPercentage(arguments.testName))
+		{
+			var variation = getNextVariation(arguments.testName);
+			var id = getGateway().insertVisitor(arguments.testName, variation);
+		}
+		else
+		{
+			//no test is active, so don't place them in the database.
+			var variation = {};
+			var id = createUUID();
+		}
     </cfscript>
 
     <!--- if your test is still running in 6 months, something is wrong --->
@@ -121,7 +130,7 @@ TODO:
     </cfscript>
 </cffunction>
 
-<cffunction name="getCurrentVariation" hint="get the current visitor variation" access="public" returntype="struct" output="false">
+<cffunction name="getCurrentCombination" hint="get the current visitor combination. If an inactive visitor, returns an empty struct." access="public" returntype="struct" output="false">
 	<cfargument name="testname" hint="the name of the test to get the variations for." type="string" required="Yes">
 	<cfscript>
 		if(!isCookiesEnabled())
@@ -138,14 +147,14 @@ TODO:
 	<cfargument name="section" hint="the name of the section to check if it is active" type="string" required="Yes">
 	<cfargument name="variation" hint="the name of the variation to check if it is active" type="string" required="Yes">
 	<cfscript>
-		var currentVariation = getCurrentVariation(arguments.testName);
+		var currentCombination = getCurrentCombination(arguments.testName);
 
-		if(!structKeyExists(currentVariation, arguments.section))
+		if(!structKeyExists(currentCombination, arguments.section))
 		{
 			return false;
 		}
 
-		return (currentVariation[arguments.section] == arguments.variation);
+		return (currentCombination[arguments.section] == arguments.variation);
     </cfscript>
 </cffunction>
 
@@ -161,6 +170,20 @@ TODO:
 <!------------------------------------------- PACKAGE ------------------------------------------->
 
 <!------------------------------------------- PRIVATE ------------------------------------------->
+
+<cffunction name="isVisitorInPercentage" hint="is the new visitor within the current percentage of visitors for this test" access="public" returntype="boolean" output="false">
+	<cfargument name="testname" hint="the name of the test" type="string" required="Yes">
+	<cfscript>
+		var config = getTestConfig(arguments.testname);
+
+		if(config.percentageVisitorTraffic == 100)
+		{
+			return true;
+		}
+
+		return (config.percentageVisitorTraffic <= randRange(1, 100));
+    </cfscript>
+</cffunction>
 
 <cffunction name="getNextVariation" hint="gets the next variation in the pool for this test" access="private" returntype="struct" output="false">
 	<cfargument name="testname" hint="the name of the test to get the variation for." type="string" required="Yes">

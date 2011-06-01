@@ -31,5 +31,8 @@
 	</squabble:section>
 </squabble:test>
 
+<hr />
+<a href="?resetCookies=1">Show Another Variation</a>
+
 <!--- Commented out for now, as the service method doesn't exist yet. --->
 <!--- <squabble:convert test="foo" name="conversion1" /> --->

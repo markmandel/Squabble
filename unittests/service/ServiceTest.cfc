@@ -198,10 +198,10 @@
 				service.runTest("foo");
 
 				assertNotEquals(service.getCurrentVisitorID("foo"), previousID, "Counter: #counter#");
-				assertNotEquals(service.getCurrentVariation("foo"), previousID, "Counter: #counter#");
+				assertNotEquals(service.getCurrentCombination("foo"), previousID, "Counter: #counter#");
 
 				previousID = service.getCurrentVisitorID("foo");
-				previousVar = service.getCurrentVariation("foo");
+				previousVar = service.getCurrentCombination("foo");
 
 				//should loop around every 16, as that is how many variations there are
 				if(counter == 1)
@@ -255,7 +255,7 @@
 			service.runTest("foo");
 
 			var visitorID = service.getCurrentVisitorID("foo");
-			var variation = service.getCurrentVariation("foo");
+			var combinations = service.getCurrentCombination("foo");
 
 			var visitorQuery = service.getGateway().getVisitor(visitorID);
 			assertEquals(1, visitorQuery.recordcount);
@@ -283,6 +283,40 @@
 			assertEquals(12, conversion.conversion_revenue);
 	    </cfscript>
 	    <cftransaction action="rollback" />
+	</cftransaction>
+</cffunction>
+
+<cffunction name="testPercentageVisitors" hint="test for percentage of visitors" access="public" returntype="void" output="false">
+	<cftransaction>
+		<cfscript>
+			service.registerTest("foo", testConfig, conversionConfigs, "50");
+			var active = 0;
+			var inactive = 0;
+
+			for(var counter = 1; counter lte 1000; counter++)
+			{
+				clearSquabbleCookies();
+				service.runTest("foo");
+
+				if(structIsEmpty(service.getCurrentCombination("foo")))
+				{
+					inactive++;
+				}
+				else
+				{
+					active++;
+				}
+			}
+
+			//to test, let's round up to the nearest 100 to make sure this is about accurate enough.
+			active /= 100;
+			inactive /= 100;
+
+			assertEquals(Round(active), Round(inactive));
+
+			debug(active); debug(inactive);
+	    </cfscript>
+    	<cftransaction action="rollback" />
 	</cftransaction>
 </cffunction>
 
