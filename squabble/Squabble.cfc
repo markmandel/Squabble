@@ -25,7 +25,6 @@
 <!---
 TODO:
 	batch round robin'ing (i.e. in blocks of 5 or 10 for better performance)
-	make percentage variation work
 	convert()
 	previewing
 	Some basic reports
@@ -85,9 +84,19 @@ TODO:
 		}
 
 		var variationKey = createTestVariationCookieKey(arguments.testName);
-		var variation = getNextVariation(arguments.testName);
 
-		var id = getGateway().insertVisitor(arguments.testName, variation);
+		//do percentage of visitor traffic
+		if(isVisitorInPercentage(arguments.testName))
+		{
+			var variation = getNextVariation(arguments.testName);
+			var id = getGateway().insertVisitor(arguments.testName, variation);
+		}
+		else
+		{
+			//no test is active, so don't place them in the database.
+			var variation = {};
+			var id = createUUID();
+		}
     </cfscript>
 
     <!--- if your test is still running in 6 months, something is wrong --->
@@ -121,7 +130,7 @@ TODO:
     </cfscript>
 </cffunction>
 
-<cffunction name="getCurrentVariation" hint="get the current visitor variation" access="public" returntype="struct" output="false">
+<cffunction name="getCurrentVariation" hint="get the current visitor variation. If an inactive visitor, returns an empty struct." access="public" returntype="struct" output="false">
 	<cfargument name="testname" hint="the name of the test to get the variations for." type="string" required="Yes">
 	<cfscript>
 		if(!isCookiesEnabled())
@@ -152,6 +161,20 @@ TODO:
 <!------------------------------------------- PACKAGE ------------------------------------------->
 
 <!------------------------------------------- PRIVATE ------------------------------------------->
+
+<cffunction name="isVisitorInPercentage" hint="is the new visitor within the current percentage of visitors for this test" access="public" returntype="boolean" output="false">
+	<cfargument name="testname" hint="the name of the test" type="string" required="Yes">
+	<cfscript>
+		var config = getTestConfig(arguments.testname);
+
+		if(config.percentageVisitorTraffic == 100)
+		{
+			return true;
+		}
+
+		return (config.percentageVisitorTraffic <= randRange(1, 100));
+    </cfscript>
+</cffunction>
 
 <cffunction name="getNextVariation" hint="gets the next variation in the pool for this test" access="private" returntype="struct" output="false">
 	<cfargument name="testname" hint="the name of the test to get the variation for." type="string" required="Yes">
