@@ -19,6 +19,10 @@
 
 <cffunction name="init" hint="Constructor" access="public" returntype="Visitor" output="false">
 	<cfscript>
+		//don't do get/set functions just for performance for cookie names.
+		variables.cookieIDNames = {};
+		variables.cookieComboNames = {};
+
 		return this;
 	</cfscript>
 </cffunction>
@@ -79,14 +83,31 @@
 
 <!------------------------------------------- PRIVATE ------------------------------------------->
 
+
+<!--- cache em, so as not to be creating tons of strings all the time --->
+
 <cffunction name="createTestIDCookieKey" hint="create the key for the cookie, that stores the current users id" access="private" returntype="string" output="false">
 	<cfargument name="testName" hint="the name of the test." type="string" required="Yes">
-	<cfreturn "squabble-#hash(arguments.testName)#-id" />
+	<cfscript>
+		if(!structKeyExists(cookieIDNames, arguments.testName))
+		{
+			cookieIDNames[arguments.testName] = "squabble-#hash(arguments.testName)#-id";
+		}
+
+		return cookieIDNames[arguments.testName];
+    </cfscript>
 </cffunction>
 
 <cffunction name="createTestCombinationCookieKey" hint="create the key for the cookie, that stores the current users variation" access="private" returntype="string" output="false">
 	<cfargument name="testName" hint="the name of the test." type="string" required="Yes">
-	<cfreturn "squabble-#hash(arguments.testName)#-v" />
+	<cfscript>
+		if(!structKeyExists(cookieComboNames, arguments.testName))
+		{
+			cookieComboNames[arguments.testName] = "squabble-#hash(arguments.testName)#-c";
+		}
+
+		return cookieComboNames[arguments.testName];
+    </cfscript>
 </cffunction>
 
 </cfcomponent>
