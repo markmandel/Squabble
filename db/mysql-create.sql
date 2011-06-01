@@ -56,5 +56,6 @@ CREATE TABLE squabble_conversions (
 	id char(35) NOT NULL,
 	visitor_id char(35) REFERENCES squabble_visitors (id),
 	conversion_date timestamp DEFAULT now(),
+	conversion_name varchar(500) NOT NULL,
 	conversion_revenue double NULL DEFAULT NULL
 ) ENGINE=InnoDB;

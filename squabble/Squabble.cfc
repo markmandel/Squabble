@@ -149,6 +149,15 @@ TODO:
     </cfscript>
 </cffunction>
 
+<cffunction name="convert" hint="Track a conversion for the current visitor" access="public" returntype="void" output="false">
+	<cfargument name="testname" hint="the name of the test to track the conversion for." type="string" required="Yes">
+	<cfargument name="conversionName" hint="The name/type of this conversion" type="string" required="false" default="The name of this conversion">
+	<cfargument name="revenue" hint="The revenue amount to record for this conversion" type="string" required="false" default="">
+	<cfscript>
+		getGateway().insertConversion(getCurrentVisitorID(arguments.testname), arguments.conversionName, arguments.revenue);
+	</cfscript>
+</cffunction>
+
 <!------------------------------------------- PACKAGE ------------------------------------------->
 
 <!------------------------------------------- PRIVATE ------------------------------------------->
