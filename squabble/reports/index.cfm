@@ -190,7 +190,7 @@
 					</table>
 				</cfoutput>
 			</div>
-		<cfelse>
+		<cfelseif structKeyExists(form, "fieldnames")>
 			<br /><br />No Test Data Found
 		</cfif>
 	</form>
