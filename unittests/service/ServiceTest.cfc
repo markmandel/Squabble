@@ -320,6 +320,37 @@
 	</cftransaction>
 </cffunction>
 
+<cffunction name="cookielessConversionTest" hint="test for percentage of visitors" access="public" returntype="void" output="false">
+	<cftransaction>
+		<cfscript>
+			clearSquabbleCookies();
+
+			service.registerTest("foo", testConfig, conversionConfigs);
+
+			// Try a conversion before running before even running a test (there should be no error thrown)
+			service.convert("foo", "Checkout");
+
+			service.runTest("foo");
+
+			// Get a visitor
+			var visitorID = service.getCurrentVisitorID("foo");
+
+			// Clear the visitor's cookies
+			clearSquabbleCookies();
+
+			// Try and Record a conversion for the visitor
+			service.convert("foo", "User Viewed About Page");
+
+			// Get all conversions for this visitor
+			var conversion = service.getGateway().getVisitorConversions(visitorID);
+
+			// Visitor should have no conversions (as they had no cookies)
+			assertEquals(0, conversion.recordcount);
+	    </cfscript>
+    	<cftransaction action="rollback" />
+	</cftransaction>
+</cffunction>
+
 <!------------------------------------------- PACKAGE ------------------------------------------->
 
 <!------------------------------------------- PRIVATE ------------------------------------------->
