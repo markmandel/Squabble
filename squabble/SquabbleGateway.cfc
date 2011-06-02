@@ -154,6 +154,48 @@
 	<cfreturn getVisitorConversionsQuery>
 </cffunction>
 
+
+<cffunction name="getAllTestData" hint="Returns a query of all visitor data and conversions for a test (Reporting)" access="public" returntype="query" output="false">
+	<cfargument name="testName" type="string" required="true" hint="Name of the test to get test data for">
+	<cfset var getAllTestDataQuery = "">
+
+	<cfquery name="getAllTestDataQuery">
+		SELECT 	v.id AS visitor_id, v.visit_date, v.test_name,
+				com.section_name, com.variation_name,
+				con.conversion_date, con.conversion_name, con.conversion_revenue
+
+		FROM 	squabble_visitors v
+
+		JOIN	squabble_combinations com
+		ON 		com.visitor_id = v.id
+
+		LEFT OUTER JOIN
+				squabble_conversions con
+		ON 		con.visitor_id = v.id
+
+		WHERE 	v.test_name = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.testName#">;
+	</cfquery>
+
+	<cfreturn getAllTestDataQuery>
+</cffunction>
+
+
+<cffunction name="getAllTests" hint="Returns an array of all the tests in the database" access="public" returntype="array" output="false">
+	<cfset var getAllTestsQuery = "">
+	<cfset var testNameArray = []>
+
+	<cfquery name="getAllTestsQuery">
+		SELECT DISTINCT test_name
+		FROM squabble_visitors;
+	</cfquery>
+
+	<cfif getAllTestsQuery.recordcount GT 0>
+		<cfset testNameArray = listToArray(valueList(getAllTestsQuery.test_name))>
+	</cfif>
+
+	<cfreturn testNameArray>
+</cffunction>
+
 <!------------------------------------------- PACKAGE ------------------------------------------->
 
 <!------------------------------------------- PRIVATE ------------------------------------------->
