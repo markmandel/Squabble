@@ -113,7 +113,7 @@
 		<cfif arrayLen(tests)>
 			<select name="testName">
 				<cfloop array="#tests#" index="testName">
-					<cfoutput><option value="#testName#">#testName#</option></cfoutput>
+					<cfoutput><option value="#testName#" <cfif structKeyExists(form, "testName") AND form.testName EQ testName>selected="selected"</cfif>>#testName#</option></cfoutput>
 				</cfloop>
 			</select>
 
@@ -140,54 +140,64 @@
 							<td>#testData.visitorTotal#</td>
 							<td>#decimalFormat(testData.conversionTotal / testData.visitorTotal * 100)#</td>
 							<td>#dollarFormat(testData.revenueTotal / testData.visitorTotal)#</td>
-							<td>#dollarFormat(testData.revenueTotal / testData.conversionTotal)#</td>
+							<td>
+								<cfif testData.conversionTotal GT 0>
+									#dollarFormat(testData.revenueTotal / testData.conversionTotal)#
+								<cfelse>
+									NA
+								</cfif>
+							</td>
 						</tr>
 					</table>
 
-					<table cellspacing="0">
-						<tr class="header">
-							<th>Combination</th>
-							<th>Hits</th>
+					<cfif testData.conversionTotal GT 0>
+						<table cellspacing="0">
+							<tr class="header">
+								<th>Combination</th>
+								<th>Hits</th>
 
-							<th>Goal</th>
-							<th>Conversions</th>
-							<th>Conv. Rate</th>
-							<th>Revenue</th>
+								<th>Goal</th>
+								<th>Conversions</th>
+								<th>Conv. Rate</th>
+								<th>Revenue</th>
 
-							<th>Total Conversions</th>
-							<th>Total Conv. Rate</th>
-							<th>Total Revenue</th>
-						</tr>
+								<th>Total Conversions</th>
+								<th>Total Conv. Rate</th>
+								<th>Total Revenue</th>
+							</tr>
 
-						<cfset currentCombination = 0>
+							<cfset currentCombination = 0>
 
-						<cfloop collection="#testData.combinations#" item="combination">
-							<cfset goalCount = 0>
-							<cfset currentCombination++>
-							<cfset combinationCount = structCount(testData.combinations[combination].conversions)>
+							<cfloop collection="#testData.combinations#" item="combination">
+								<cfset goalCount = 0>
+								<cfset currentCombination++>
+								<cfset combinationCount = structCount(testData.combinations[combination].conversions)>
 
-							<cfloop collection="#testData.combinations[combination].conversions#" item="conversionName">
-								<cfset goalCount++>
-								<tr <cfif currentCombination MOD 2 EQ 0>class="odd"</cfif>>
-									<cfif goalCount EQ 1>
-										<td rowspan="#combinationCount#">#combination#</td>
-										<td rowspan="#combinationCount#">#testData.combinations[combination].hits#</td>
-									</cfif>
+								<cfloop collection="#testData.combinations[combination].conversions#" item="conversionName">
+									<cfset goalCount++>
+									<tr <cfif currentCombination MOD 2 EQ 0>class="odd"</cfif>>
+										<cfif goalCount EQ 1>
+											<td rowspan="#combinationCount#">#combination#</td>
+											<td rowspan="#combinationCount#">#testData.combinations[combination].hits#</td>
+										</cfif>
 
-									<td>#conversionName#</td>
-									<td>#testData.combinations[combination].conversions[conversionName]#</td>
-									<td>#decimalFormat(testData.combinations[combination].conversions[conversionName] / testData.combinations[combination].hits * 100)#%</td>
-									<td>#dollarFormat(testData.combinations[combination].revenue[conversionName])#</td>
+										<td>#conversionName#</td>
+										<td>#testData.combinations[combination].conversions[conversionName]#</td>
+										<td>#decimalFormat(testData.combinations[combination].conversions[conversionName] / testData.combinations[combination].hits * 100)#%</td>
+										<td>#dollarFormat(testData.combinations[combination].revenue[conversionName])#</td>
 
-									<cfif goalCount EQ 1>
-										<td rowspan="#combinationCount#">#testData.combinations[combination].conversionsTotal#</td>
-										<td rowspan="#combinationCount#">#decimalFormat(testData.combinations[combination].conversionsTotal / testData.combinations[combination].hits * 100)#%</td>
-										<td rowspan="#combinationCount#">#dollarFormat(testData.combinations[combination].revenueTotal)#</td>
-									</cfif>
-								</tr>
+										<cfif goalCount EQ 1>
+											<td rowspan="#combinationCount#">#testData.combinations[combination].conversionsTotal#</td>
+											<td rowspan="#combinationCount#">#decimalFormat(testData.combinations[combination].conversionsTotal / testData.combinations[combination].hits * 100)#%</td>
+											<td rowspan="#combinationCount#">#dollarFormat(testData.combinations[combination].revenueTotal)#</td>
+										</cfif>
+									</tr>
+								</cfloop>
 							</cfloop>
-						</cfloop>
-					</table>
+						</table>
+					<cfelse>
+						<br />No conversions recorded for this test yet.
+					</cfif>
 				</cfoutput>
 			</div>
 		<cfelseif structKeyExists(form, "fieldnames")>
