@@ -19,6 +19,8 @@
 <cfscript>
 	this.name = "Squabble Demo Application";
 	this.datasource = "Squabble";
+
+	this.mappings["/squabble"] = expandPath("../squabble");
 </cfscript>
 
 <!------------------------------------------- PUBLIC ------------------------------------------->
