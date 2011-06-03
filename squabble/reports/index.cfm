@@ -71,7 +71,7 @@
 		<cfif structKeyExists(form, "fieldnames") AND totalVisitors GT 0>
 			<cfscript>
 				totalConversions = application.squabble.getGateway().getTotalConversions(form.testName);
-				conversions = totalConversions.recordcount EQ 1;
+				conversions = totalConversions.recordcount EQ 1 AND totalConversions.total_conversions GT 0;
 			</cfscript>
 
 			<div id="testData">
@@ -103,17 +103,17 @@
 					</table>
 				</cfoutput>
 
-				<cfif conversions AND totalConversions.total_conversions GT 0>
+				<cfif conversions>
 					<cfscript>
 						combinationTotalVisitors = application.squabble.getGateway().getCombinationTotalVisitors(form.testName);
 						combinationTotalConversions = application.squabble.getGateway().getCombinationTotalConversions(form.testName);
 						goalTotalConversions = application.squabble.getGateway().getGoalTotalConversions(form.testName);
 
-						/* Debug
+						/* Debug*/
 							writeDump(var=combinationTotalVisitors, expand=false);
 							writeDump(var=combinationTotalConversions, expand=false);
 							writeDump(var=goalTotalConversions, expand=false);
-						*/
+
 					</cfscript>
 
 					<table cellspacing="0">
@@ -152,15 +152,15 @@
 										<td rowspan="#totalGoals#">#combinationVisitors#</td>
 										<td rowspan="#totalGoals#">#combinationConversions#</td>
 										<td rowspan="#totalGoals#">#decimalFormat(combinationConversions / combinationVisitors * 100)#%</td>
-										<td rowspan="#totalGoals#">#combinationConversionTotal#</td>
-										<td rowspan="#totalGoals#">#decimalFormat(combinationConversionTotal / combinationConversions)#</td>
+										<td rowspan="#totalGoals#"><cfif isNumeric(combinationConversionTotal)>#combinationConversionTotal#<cfelse>NA</cfif></td>
+										<td rowspan="#totalGoals#"><cfif isNumeric(combinationConversionTotal)>#decimalFormat(val(combinationConversionTotal) / combinationConversions)#<cfelse>NA</cfif></td>
 									</cfif>
 
 									<td>#conversion_name#</td>
 									<td>#total_conversions#</td>
 									<td>#decimalFormat(total_conversions / combinationVisitors * 100)#%</td>
-									<td>#total_value#</td>
-									<td>#decimalFormat(total_value / total_conversions)#</td>
+									<td><cfif isNumeric(total_value)>#total_value#<cfelse>NA</cfif></td>
+									<td><cfif isNumeric(total_value)>#decimalFormat(val(total_value) / total_conversions)#<cfelse>NA</cfif></td>
 								</tr>
 							</cfoutput>
 						</cfoutput>
