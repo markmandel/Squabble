@@ -63,28 +63,32 @@
 			// Visitor with 1 conversion
 			var expectedDate = dateAdd("d", -1, now());
 			var visitorID = service.insertVisitor("foo", variationData);
-			service.insertConversion(visitorID, "Credit Card Checkout", 2.2, expectedDate);
+			service.insertConversion(visitorID, "Credit Card Checkout", 2.2, 34.5, expectedDate);
 			var conversions = service.getVisitorConversions(visitorID);
 			assertTrue(conversions.recordcount EQ 1);
 			assertEquals(visitorID, conversions.visitor_id);
-			assertEquals(2.2, conversions.conversion_revenue);
+			assertEquals(2.2, conversions.conversion_value);
+			assertEquals(34.5, conversions.conversion_units);
 			assertEquals("Credit Card Checkout", conversions.conversion_name);
 			assertEquals(expectedDate, parseDateTime(conversions.conversion_date));
 
 			// Visitor with 3 conversions
 			visitorID = service.insertVisitor("bar", variationData);
 			service.insertConversion(visitorID, "Credit Card Checkout", 2.2);
-			service.insertConversion(visitorID, "PayPal Checkout", 24);
+			service.insertConversion(visitorID, "PayPal Checkout", 24, 67);
 			service.insertConversion(visitorID, "Credit Card Checkout", 9.63);
 			conversions = service.getVisitorConversions(visitorID);
 
-			var expected = [2.2,24.0,9.63];
-
 			assertTrue(conversions.recordcount EQ 3);
 			assertEquals(visitorID, conversions.visitor_id[1]);
+			assertEquals(2.2, conversions.conversion_value[1]);
+			assertEquals("", conversions.conversion_units[1]);
 			assertEquals(visitorID, conversions.visitor_id[2]);
+			assertEquals(24.0, conversions.conversion_value[2]);
+			assertEquals(67.0, conversions.conversion_units[2]);
 			assertEquals(visitorID, conversions.visitor_id[3]);
-			assertEquals(expected, listToArray(valueList(conversions.conversion_revenue)));
+			assertEquals(9.63, conversions.conversion_value[3]);
+			assertEquals("", conversions.conversion_units[3]);
 	    </cfscript>
 	    <cftransaction action="rollback" />
     </cftransaction>

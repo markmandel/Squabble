@@ -126,7 +126,8 @@
 <cffunction name="convert" hint="Track a conversion for the current visitor" access="public" returntype="void" output="false">
 	<cfargument name="testname" hint="the name of the test to track the conversion for." type="string" required="Yes">
 	<cfargument name="conversionName" hint="The name/type of this conversion" type="string" required="false" default="The name of this conversion">
-	<cfargument name="revenue" hint="The revenue amount to record for this conversion" type="string" required="false" default="">
+	<cfargument name="conversionValue" hint="The value to record for this conversion" type="string" required="false" default="">
+	<cfargument name="conversionUnits" hint="The unit amount to record for this conversion" type="string" required="false" default="">
 	<cfscript>
 		//if for whatever reason they don't have an id, ignore them.
 		if(!getVisitor().hasID(arguments.testName))
@@ -140,7 +141,7 @@
 			return;
 		}
 
-		getGateway().insertConversion(getCurrentVisitorID(arguments.testname), arguments.conversionName, arguments.revenue);
+		getGateway().insertConversion(getCurrentVisitorID(arguments.testname), arguments.conversionName, arguments.conversionValue, arguments.conversionUnits);
 	</cfscript>
 </cffunction>
 

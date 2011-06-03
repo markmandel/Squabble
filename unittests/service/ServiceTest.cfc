@@ -280,7 +280,7 @@
 
 			assertEquals(1, conversion.recordcount);
 			assertEquals("PayPal Checkout", conversion.conversion_name);
-			assertEquals(12, conversion.conversion_revenue);
+			assertEquals(12, conversion.conversion_value);
 	    </cfscript>
 	    <cftransaction action="rollback" />
 	</cftransaction>

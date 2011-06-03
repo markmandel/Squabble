@@ -110,7 +110,8 @@
 <cffunction name="insertConversion" hint="Records a conversion for a visitor" access="public" returntype="string" output="false">
 	<cfargument name="visitorID" type="string" required="true" hint="The visitor ID to record the conversion for">
 	<cfargument name="conversionName" type="string" required="true" hint="The name/type of this conversion">
-	<cfargument name="conversionRevenue" type="string" required="false" default="" hint="The revenue amount to record for this conversion">
+	<cfargument name="conversionValue" type="string" required="false" default="" hint="The value to record for this conversion">
+	<cfargument name="conversionUnits" type="string" required="false" default="" hint="The unit value to record for this conversion">
 	<cfargument name="conversionDate" type="date" required="false" default="#now()#" hint="The date the conversion happened">
 	<cfset var conversionID = createUUID()>
 
@@ -120,14 +121,16 @@
 			visitor_id,
 			conversion_date,
 			conversion_name,
-			conversion_revenue
+			conversion_value,
+			conversion_units
 		)
 		VALUES (
 			<cfqueryparam cfsqltype="cf_sql_char" value="#conversionID#" maxlength="35">,
 			<cfqueryparam cfsqltype="cf_sql_char" value="#arguments.visitorID#" maxlength="35">,
 			<cfqueryparam cfsqltype="cf_sql_timestamp" value="#arguments.conversionDate#">,
 			<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.conversionName#">,
-			<cfqueryparam cfsqltype="cf_sql_double" value="#arguments.conversionRevenue#" null="#NOT isNumeric(arguments.conversionRevenue)#">
+			<cfqueryparam cfsqltype="cf_sql_double" value="#arguments.conversionValue#" null="#NOT isNumeric(arguments.conversionValue)#">,
+			<cfqueryparam cfsqltype="cf_sql_double" value="#arguments.conversionUnits#" null="#NOT isNumeric(arguments.conversionUnits)#">
 		)
 	</cfquery>
 
@@ -141,7 +144,7 @@
 
 	<cfquery name="getVisitorConversionsQuery">
 		SELECT 	v.id AS visitor_id, v.visit_date, v.test_name,
-				con.id AS conversion_id, con.conversion_date, con.conversion_name, con.conversion_revenue
+				con.id AS conversion_id, con.conversion_date, con.conversion_name, con.conversion_value, con.conversion_units
 
 		FROM 	squabble_visitors v
 
@@ -162,7 +165,7 @@
 	<cfquery name="getAllTestDataQuery">
 		SELECT 	v.id AS visitor_id, v.visit_date, v.test_name,
 				com.section_name, com.variation_name,
-				con.conversion_date, con.conversion_name, con.conversion_revenue
+				con.conversion_date, con.conversion_name, con.conversion_value, con.conversion_units
 
 		FROM 	squabble_visitors v
 

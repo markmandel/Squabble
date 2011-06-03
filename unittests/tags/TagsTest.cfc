@@ -176,30 +176,32 @@
 
 		<cfimport prefix="squabble" taglib="/squabble/tags" />
 
-		<squabble:convert test="foo" name="conversion1" revenue="12.34" squabble="#service#" />
+		<squabble:convert test="foo" name="conversion1" value="12.34" squabble="#service#" />
 
 		<cfset var conversions = gateway.getVisitorConversions(visitorID) />
 
 		<cfset assertTrue(conversions.recordcount eq 1) />
 		<cfset assertEquals(visitorID, conversions.visitor_id) />
 		<cfset assertEquals("conversion1", conversions.conversion_name) />
-		<cfset assertEquals("12.34", conversions.conversion_revenue) />
+		<cfset assertEquals("12.34", conversions.conversion_value) />
 
-		<squabble:convert test="foo" name="conversion1" revenue="5" squabble="#service#" />
-		<squabble:convert test="foo" name="conversion2" revenue="1000" squabble="#service#" />
+		<squabble:convert test="foo" name="conversion1" value="5" squabble="#service#" />
+		<squabble:convert test="foo" name="conversion2" value="1000" units="84" squabble="#service#" />
 
 		<cfset conversions = gateway.getVisitorConversions(visitorID) />
 
 		<cfset assertTrue(conversions.recordcount eq 3) />
 		<cfset assertEquals(visitorID, conversions.visitor_id[1]) />
 		<cfset assertEquals("conversion1", conversions.conversion_name[1]) />
-		<cfset assertEquals("12.34", conversions.conversion_revenue[1]) />
+		<cfset assertEquals("12.34", conversions.conversion_value[1]) />
 		<cfset assertEquals(visitorID, conversions.visitor_id[2]) />
 		<cfset assertEquals("conversion1", conversions.conversion_name[2]) />
-		<cfset assertEquals("5", conversions.conversion_revenue[2]) />
+		<cfset assertEquals("5", conversions.conversion_value[2]) />
+		<cfset assertEquals("", conversions.conversion_units[2]) />
 		<cfset assertEquals(visitorID, conversions.visitor_id[3]) />
 		<cfset assertEquals("conversion2", conversions.conversion_name[3]) />
-		<cfset assertEquals("1000", conversions.conversion_revenue[3]) />
+		<cfset assertEquals("1000", conversions.conversion_value[3]) />
+		<cfset assertEquals("84", conversions.conversion_units[3]) />
 
     	<cftransaction action="rollback" />
 	</cftransaction>
