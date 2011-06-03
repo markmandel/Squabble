@@ -109,11 +109,11 @@
 						combinationTotalConversions = application.squabble.getGateway().getCombinationTotalConversions(form.testName);
 						goalTotalConversions = application.squabble.getGateway().getGoalTotalConversions(form.testName);
 
-						/* Debug*/
+						/* Debug
 							writeDump(var=combinationTotalVisitors, expand=false);
 							writeDump(var=combinationTotalConversions, expand=false);
 							writeDump(var=goalTotalConversions, expand=false);
-
+						*/
 					</cfscript>
 
 					<table cellspacing="0">
