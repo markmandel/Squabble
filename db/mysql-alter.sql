@@ -23,7 +23,7 @@ ALTER TABLE `squabble_conversions`
   ON UPDATE RESTRICT
 , ADD INDEX `fk_conversion_visitor_id` (`visitor_id` ASC) ;
 
-ALTER TABLE `squabble_conversions `
+ALTER TABLE `squabble_conversions`
 CHANGE `conversion_revenue` `conversion_value` double;
 
 ALTER TABLE `squabble_conversions`
