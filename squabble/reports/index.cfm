@@ -26,63 +26,9 @@
 <cfif structKeyExists(form, "fieldnames")>
 	<cfparam name="form.testName" type="string" default="">
 
-	<cfset testQuery = application.squabble.getGateway().getAllTestData(form.testName)>
-	<cfset testData = structNew()>
-
-	<cfif testQuery.recordcount GT 0>
-		<cfset visitor_count = 0>
-		<cfset conversion_count = 0>
-		<cfset revenue_total = 0>
-		<cfset testData.combinations = {}>
-
-		<cfoutput query="testQuery" group="visitor_id">
-			<cfset visitor_count++>
-
-			<cfset combination = "">
-
-			<cfoutput group="section_name">
-				<cfset combination = listAppend(combination, variation_name, "-")>
-			</cfoutput>
-
-			<cfif !structKeyExists(testData.combinations, combination)>
-				<cfset testData.combinations[combination] = {
-					hits = 0,
-					conversions = {},
-					revenue = {},
-					conversionsTotal = 0,
-					revenueTotal = 0
-				}>
-			</cfif>
-
-			<cfset testData.combinations[combination].hits++>
-
-			<cfif isDate(conversion_date)>
-				<cfset conversion_count++>
-				<cfset testData.combinations[combination].conversionsTotal++>
-
-				<cfif !structKeyExists(testData.combinations[combination].conversions, conversion_name)>
-					<cfset testData.combinations[combination].conversions[conversion_name] = 0>
-				</cfif>
-
-				<cfif !structKeyExists(testData.combinations[combination].revenue, conversion_name)>
-					<cfset testData.combinations[combination].revenue[conversion_name] = 0>
-				</cfif>
-
-				<cfset testData.combinations[combination].conversions[conversion_name]++>
-
-				<cfif isNumeric(conversion_revenue)>
-					<cfset revenue_total += conversion_revenue>
-					<cfset testData.combinations[combination].revenue[conversion_name] += conversion_revenue>
-					<cfset testData.combinations[combination].revenueTotal += conversion_revenue>
-				</cfif>
-			</cfif>
-		</cfoutput>
-
-		<cfset testData.visitorTotal = visitor_count>
-		<cfset testData.conversionTotal = conversion_count>
-		<cfset testData.revenueTotal = revenue_total>
-		<cfset testData.testName = form.testName>
-	</cfif>
+	<cfscript>
+		totalVisitors = application.squabble.getGateway().getTotalVisitors(form.testName);
+	</cfscript>
 </cfif>
 
 </cfsilent><!DOCTYPE html>
@@ -122,83 +68,105 @@
 			No Tests Recorded!
 		</cfif>
 
-		<cfif structKeyExists(form, "fieldnames") AND !structIsEmpty(testData)>
+		<cfif structKeyExists(form, "fieldnames") AND totalVisitors GT 0>
+			<cfscript>
+				totalConversions = application.squabble.getGateway().getTotalConversions(form.testName);
+				conversions = totalConversions.recordcount EQ 1;
+			</cfscript>
+
 			<div id="testData">
 				<cfoutput>
-					<h2>#testData.testName#</h2>
+					<h2>#form.testName#</h2>
 
 					<table cellspacing="0">
 						<tr class="header">
-							<th>Conv.</th>
 							<th>Visitors</th>
-							<th>Conv. %</th>
-							<th>Average Conv. Rate (All Visitors)</th>
-							<th>Average Conv. Rate (Per Conversion)</th>
+							<th>Conv.</th>
+							<th>Conv. Rate</th>
+							<th>Total Conv. Value</th>
+							<th>Average Conv. Value</th>
 						</tr>
 						<tr>
-							<td>#testData.conversionTotal#</td>
-							<td>#testData.visitorTotal#</td>
-							<td>#decimalFormat(testData.conversionTotal / testData.visitorTotal * 100)#</td>
-							<td>#dollarFormat(testData.revenueTotal / testData.visitorTotal)#</td>
-							<td>
-								<cfif testData.conversionTotal GT 0>
-									#dollarFormat(testData.revenueTotal / testData.conversionTotal)#
-								<cfelse>
-									NA
-								</cfif>
-							</td>
+							<td>#totalVisitors#</td>
+							<cfif conversions>
+								<td>#totalConversions.total_conversions#</td>
+								<td>#decimalFormat(totalConversions.total_conversions / totalVisitors * 100)#%</td>
+								<td>#decimalFormat(val(totalConversions.total_value))#</td>
+								<td>#decimalFormat(val(totalConversions.total_value) / totalConversions.total_conversions)#</td>
+							<cfelse>
+								<td>0</td>
+								<td>NA</td>
+								<td>NA</td>
+								<td>NA</td>
+							</cfif>
 						</tr>
 					</table>
-
-					<cfif testData.conversionTotal GT 0>
-						<table cellspacing="0">
-							<tr class="header">
-								<th>Combination</th>
-								<th>Hits</th>
-
-								<th>Goal</th>
-								<th>Conversions</th>
-								<th>Conv. Rate</th>
-								<th>Revenue</th>
-
-								<th>Total Conversions</th>
-								<th>Total Conv. Rate</th>
-								<th>Total Revenue</th>
-							</tr>
-
-							<cfset currentCombination = 0>
-
-							<cfloop collection="#testData.combinations#" item="combination">
-								<cfset goalCount = 0>
-								<cfset currentCombination++>
-								<cfset combinationCount = structCount(testData.combinations[combination].conversions)>
-
-								<cfloop collection="#testData.combinations[combination].conversions#" item="conversionName">
-									<cfset goalCount++>
-									<tr <cfif currentCombination MOD 2 EQ 0>class="odd"</cfif>>
-										<cfif goalCount EQ 1>
-											<td rowspan="#combinationCount#">#combination#</td>
-											<td rowspan="#combinationCount#">#testData.combinations[combination].hits#</td>
-										</cfif>
-
-										<td>#conversionName#</td>
-										<td>#testData.combinations[combination].conversions[conversionName]#</td>
-										<td>#decimalFormat(testData.combinations[combination].conversions[conversionName] / testData.combinations[combination].hits * 100)#%</td>
-										<td>#dollarFormat(testData.combinations[combination].revenue[conversionName])#</td>
-
-										<cfif goalCount EQ 1>
-											<td rowspan="#combinationCount#">#testData.combinations[combination].conversionsTotal#</td>
-											<td rowspan="#combinationCount#">#decimalFormat(testData.combinations[combination].conversionsTotal / testData.combinations[combination].hits * 100)#%</td>
-											<td rowspan="#combinationCount#">#dollarFormat(testData.combinations[combination].revenueTotal)#</td>
-										</cfif>
-									</tr>
-								</cfloop>
-							</cfloop>
-						</table>
-					<cfelse>
-						<br />No conversions recorded for this test yet.
-					</cfif>
 				</cfoutput>
+
+				<cfif conversions AND totalConversions.total_conversions GT 0>
+					<cfscript>
+						combinationTotalVisitors = application.squabble.getGateway().getCombinationTotalVisitors(form.testName);
+						combinationTotalConversions = application.squabble.getGateway().getCombinationTotalConversions(form.testName);
+						goalTotalConversions = application.squabble.getGateway().getGoalTotalConversions(form.testName);
+
+						/* Debug
+							writeDump(var=combinationTotalVisitors, expand=false);
+							writeDump(var=combinationTotalConversions, expand=false);
+							writeDump(var=goalTotalConversions, expand=false);
+						*/
+					</cfscript>
+
+					<table cellspacing="0">
+						<tr class="header">
+							<th>Combination</th>
+							<th>Hits</th>
+							<th>Conversions</th>
+							<th>Conv. Rate</th>
+							<th>Conv. Value</th>
+							<th>Avg Conv. Value</th>
+
+							<th>Goal</th>
+							<th>Conversions</th>
+							<th>Conv. Rate</th>
+							<th>Conv. Value</th>
+							<th>Avg Conv. Value</th>
+						</tr>
+
+						<cfset combinationCount = 0>
+
+						<cfoutput query="goalTotalConversions" group="combination">
+							<cfset combinationCount++>
+							<cfset goalCount = 0>
+							<cfset totalGoals = 0>
+							<cfoutput><cfset totalGoals++></cfoutput>
+
+							<cfoutput>
+								<cfset goalCount++>
+								<cfset combinationVisitors = combinationTotalVisitors.total_visitors[combinationCount]>
+								<cfset combinationConversions = combinationTotalConversions.total_conversions[combinationCount]>
+								<cfset combinationConversionTotal = combinationTotalConversions.total_value[combinationCount]>
+
+								<tr <cfif combinationCount MOD 2 EQ 0>class="odd"</cfif>>
+									<cfif goalCount EQ 1>
+										<td rowspan="#totalGoals#"><strong>#combination#</strong></td>
+										<td rowspan="#totalGoals#">#combinationVisitors#</td>
+										<td rowspan="#totalGoals#">#combinationConversions#</td>
+										<td rowspan="#totalGoals#">#decimalFormat(combinationConversions / combinationVisitors * 100)#%</td>
+										<td rowspan="#totalGoals#">#combinationConversionTotal#</td>
+										<td rowspan="#totalGoals#">#decimalFormat(combinationConversionTotal / combinationConversions)#</td>
+									</cfif>
+
+									<td>#conversion_name#</td>
+									<td>#total_conversions#</td>
+									<td>#decimalFormat(total_conversions / combinationVisitors * 100)#%</td>
+									<td>#total_value#</td>
+									<td>#decimalFormat(total_value / total_conversions)#</td>
+								</tr>
+							</cfoutput>
+						</cfoutput>
+
+					</table>
+				</cfif>
 			</div>
 		<cfelseif structKeyExists(form, "fieldnames")>
 			<br /><br />No Test Data Found
