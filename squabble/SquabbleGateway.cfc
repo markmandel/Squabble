@@ -203,7 +203,8 @@
 	<cfquery name="getTotalConversionsQuery">
 		SELECT
 			COUNT(squabble_visitors.id) AS total_conversions,
-			SUM(squabble_conversions.conversion_value) AS total_value
+			SUM(squabble_conversions.conversion_value) AS total_value,
+			SUM(squabble_conversions.conversion_units) AS total_units
 		FROM
 			squabble_conversions
 			INNER JOIN squabble_visitors
@@ -253,6 +254,7 @@
 		SELECT
 			COUNT(combinations.id) AS total_conversions,
 			SUM(squabble_conversions.conversion_value) AS total_value,
+			SUM(squabble_conversions.conversion_units) AS total_units,
 			combinations.combination
 		FROM
 		(
@@ -288,6 +290,7 @@
 		SELECT
 			COUNT(combinations.id) AS total_conversions,
 			SUM(squabble_conversions.conversion_value) AS total_value,
+			SUM(squabble_conversions.conversion_units) AS total_units,
 			combinations.combination,
 			squabble_conversions.conversion_name
 		FROM

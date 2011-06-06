@@ -37,17 +37,20 @@
 	<meta charset="utf-8" />
 	<title>Squabble Simple Report</title>
 	<style type="text/css">
-		* { margin: 0; padding: 0; }
+		* { margin: 0; padding: 0; font-family: inherit; }
 		html { height: 100%; width: 100%; }
-		body { margin: 20px; }
+		body { margin: 20px; font-family: Ubuntu, Arial, Helvetica; font-size: 9pt; }
 
 		#testData { margin-top: 20px; }
 
 		#testData table { margin-top: 15px; border: solid 1px #ccc; }
 		th { font-weight: bold; }
-		td, th { text-align: center; padding: 8px 15px; }
+		td, th { text-align: center; padding: 6px 12px; }
 		.header { background-color: #ddd; }
 		.odd { background-color: #efefef;  }
+		.green {color: #00CC00; }
+		.red {color: #CC0000; }
+
 	</style>
 </head>
 <body>
@@ -85,6 +88,11 @@
 							<th>Conv. Rate</th>
 							<th>Total Conv. Value</th>
 							<th>Average Conv. Value</th>
+							<cfif val(totalConversions.total_units) GT 0>
+								<th>Units</th>
+								<th>Avg. Value Per Unit</th>
+								<th>Units Per Conv.</th>
+							</cfif>
 						</tr>
 						<tr>
 							<td>#totalVisitors#</td>
@@ -93,6 +101,11 @@
 								<td>#decimalFormat(totalConversions.total_conversions / totalVisitors * 100)#%</td>
 								<td>#decimalFormat(val(totalConversions.total_value))#</td>
 								<td>#decimalFormat(val(totalConversions.total_value) / totalConversions.total_conversions)#</td>
+								<cfif val(totalConversions.total_units) GT 0>
+									<td>#val(totalConversions.total_units)#</td>
+									<td>#dollarFormat(val(totalConversions.total_value) / totalConversions.total_units)#</td>
+									<td>#decimalFormat(totalConversions.total_units / totalConversions.total_conversions)#</td>
+								</cfif>
 							<cfelse>
 								<td>0</td>
 								<td>NA</td>
@@ -116,20 +129,54 @@
 						*/
 					</cfscript>
 
+					<!--- Work out if we can measure against control --->
+					<cfset haveControl = false>
+
+					<cfquery name="controlVisitors" dbtype="query">
+						SELECT total_visitors FROM combinationTotalVisitors WHERE combination = 'control';
+					</cfquery>
+
+					<cfif controlVisitors.recordcount EQ 1 AND controlVisitors.total_visitors GT 0>
+						<cfset haveControl = true>
+
+						<cfquery name="controlConversions" dbtype="query">
+							SELECT total_conversions, total_value FROM combinationTotalConversions WHERE combination = 'control';
+						</cfquery>
+
+						<cfset control = {
+							visitors = controlVisitors.total_visitors,
+							conversions = controlConversions.total_conversions,
+							value = controlConversions.total_value
+						}>
+
+						<cfset control.conversionRate = decimalFormat(control.conversions / control.visitors * 100)>
+					</cfif>
+
 					<table cellspacing="0">
 						<tr class="header">
 							<th>Combination</th>
 							<th>Hits</th>
 							<th>Conversions</th>
 							<th>Conv. Rate</th>
+							<th>% Improvment</th>
 							<th>Conv. Value</th>
 							<th>Avg Conv. Value</th>
+							<cfif val(totalConversions.total_units) GT 0>
+								<th>Units</th>
+								<th>Avg. Value Per Unit</th>
+								<th>Units Per Conv.</th>
+							</cfif>
 
 							<th>Goal</th>
 							<th>Conversions</th>
 							<th>Conv. Rate</th>
 							<th>Conv. Value</th>
 							<th>Avg Conv. Value</th>
+							<cfif val(totalConversions.total_units) GT 0>
+								<th>Units</th>
+								<th>Avg. Value Per Unit</th>
+								<th>Units Per Conv.</th>
+							</cfif>
 						</tr>
 
 						<cfset combinationCount = 0>
@@ -141,19 +188,36 @@
 							<cfoutput><cfset totalGoals++></cfoutput>
 
 							<cfoutput>
-								<cfset goalCount++>
-								<cfset combinationVisitors = combinationTotalVisitors.total_visitors[combinationCount]>
-								<cfset combinationConversions = combinationTotalConversions.total_conversions[combinationCount]>
-								<cfset combinationConversionTotal = combinationTotalConversions.total_value[combinationCount]>
+								<cfscript>
+									goalCount++;
+									combinationVisitors = combinationTotalVisitors.total_visitors[combinationCount];
+									combinationConversions = combinationTotalConversions.total_conversions[combinationCount];
+									combinationConversionTotal = combinationTotalConversions.total_value[combinationCount];
+									combinationUnitsTotal = combinationTotalConversions.total_units[combinationCount];
+									combinationConversionRate = decimalFormat(combinationConversions / combinationVisitors * 100);
+								</cfscript>
 
 								<tr <cfif combinationCount MOD 2 EQ 0>class="odd"</cfif>>
 									<cfif goalCount EQ 1>
 										<td rowspan="#totalGoals#"><strong>#combination#</strong></td>
 										<td rowspan="#totalGoals#">#combinationVisitors#</td>
 										<td rowspan="#totalGoals#">#combinationConversions#</td>
-										<td rowspan="#totalGoals#">#decimalFormat(combinationConversions / combinationVisitors * 100)#%</td>
+										<td rowspan="#totalGoals#">#combinationConversionRate#%</td>
+										<td rowspan="#totalGoals#">
+											<cfif haveControl AND combination NEQ "control">
+												<cfset conversionRate = decimalFormat(combinationConversionRate - control.conversionRate)>
+												<span class="<cfif conversionRate GT 0>green<cfelse>red</cfif>"><cfif conversionRate GT 0>+</cfif>#conversionRate#%</span>
+											<cfelse>
+												NA
+											</cfif>
+										</td>
 										<td rowspan="#totalGoals#"><cfif isNumeric(combinationConversionTotal)>#combinationConversionTotal#<cfelse>NA</cfif></td>
 										<td rowspan="#totalGoals#"><cfif isNumeric(combinationConversionTotal)>#decimalFormat(val(combinationConversionTotal) / combinationConversions)#<cfelse>NA</cfif></td>
+										<cfif val(totalConversions.total_units) GT 0>
+											<td rowspan="#totalGoals#">#val(combinationUnitsTotal)#</td>
+											<td rowspan="#totalGoals#"><cfif val(combinationUnitsTotal) GT 0>#combinationConversionTotal / combinationUnitsTotal#<cfelse>NA</cfif></td>
+											<td rowspan="#totalGoals#"><cfif val(combinationConversions) GT 0 AND val(combinationUnitsTotal) GT 0>#decimalFormat(combinationUnitsTotal / combinationConversions)#<cfelse>NA</cfif></td>
+										</cfif>
 									</cfif>
 
 									<td>#conversion_name#</td>
@@ -161,6 +225,11 @@
 									<td>#decimalFormat(total_conversions / combinationVisitors * 100)#%</td>
 									<td><cfif isNumeric(total_value)>#total_value#<cfelse>NA</cfif></td>
 									<td><cfif isNumeric(total_value)>#decimalFormat(val(total_value) / total_conversions)#<cfelse>NA</cfif></td>
+									<cfif val(totalConversions.total_units) GT 0>
+										<td>#val(total_units)#</td>
+										<td><cfif val(total_units) GT 0 AND isNumeric(total_value)>#decimalFormat(total_value / total_units)#<cfelse>NA</cfif></td>
+										<td><cfif val(total_units) GT 0 AND isNumeric(total_conversions)>#decimalFormat(total_units / total_conversions)#<cfelse>NA</cfif></td>
+									</cfif>
 								</tr>
 							</cfoutput>
 						</cfoutput>
