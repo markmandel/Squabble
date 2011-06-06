@@ -16,10 +16,11 @@
 
 <cfcomponent hint="Service Layer for Squabble. To be instantiated on applications start up as a singleton." output="false" accessors="true">
 
-<cfproperty name="testConfigurations" type="struct" />
-<cfproperty name="testCombinations" type="struct" />
-<cfproperty name="gateway" type="any">
-<cfproperty name="visitor" type="any">
+<cfproperty name="testConfigurations" type="struct" hint="The test configurations"/>
+<cfproperty name="testCombinations" type="struct" hint="The set of combinations for each test"/>
+<cfproperty name="gateway" type="any" hint="Data access gateway">
+<cfproperty name="visitor" type="any" hint="The visitor details">
+<cfproperty name="browser" type="any" hint="The browser details">
 
 <!------------------------------------------- PUBLIC ------------------------------------------->
 
