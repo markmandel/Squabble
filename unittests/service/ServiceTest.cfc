@@ -274,6 +274,7 @@
 
 			service.registerTest("foo", testConfig, conversionConfigs);
 			service.runTest("foo");
+
 			service.convert("foo", "PayPal Checkout", 12);
 
 			var conversion = service.getGateway().getVisitorConversions(service.getCurrentVisitorID("foo"));
@@ -351,7 +352,7 @@
 	</cftransaction>
 </cffunction>
 
-<cffunction name="crawlerConversionTest" hint="test that a crawler will not cause a visitor" access="public" returntype="void" output="false">
+<cffunction name="crawlerTest" hint="test that a crawler will not cause a visitor" access="public" returntype="void" output="false">
 	<cftransaction>
 		<cfscript>
 			var testName = createUUID();
@@ -364,6 +365,10 @@
 
 			service.registerTest(testName, testConfig, conversionConfigs);
 			service.runTest(testName);
+
+			//make sure asking for a conversion doesn't break, should return an empty struct
+			assertEquals("", service.getCurrentVisitorID(testName));
+			assertTrue(structIsEmpty(service.getCurrentCombination(testName)));
 	    </cfscript>
 
 	    <cfquery name="local.count">

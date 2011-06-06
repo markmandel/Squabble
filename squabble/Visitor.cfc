@@ -46,7 +46,7 @@
 		var key = createTestIDCookieKey(arguments.testName);
 
 		//have to do length, as deleting the cookie just makes the length 0.
-		return structKeyExists(cookie, key) AND Len(cookie[key]);
+		return (structKeyExists(cookie, key) AND Len(cookie[key]));
     </cfscript>
 </cffunction>
 

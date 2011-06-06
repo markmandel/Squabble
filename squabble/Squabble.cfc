@@ -157,12 +157,26 @@
 
 <cffunction name="getCurrentVisitorID" hint="get the current visitor ID" access="public" returntype="string" output="false">
 	<cfargument name="testname" hint="the name of the test to get the combinations for." type="string" required="Yes">
-	<cfreturn getVisitor().getID(arguments.testName) />
+	<cfscript>
+		if(getVisitor().hasID(arguments.testName))
+		{
+			return getVisitor().getID(arguments.testName);
+		}
+
+		return "";
+    </cfscript>
 </cffunction>
 
 <cffunction name="getCurrentCombination" hint="get the current visitor combination. If an inactive visitor, returns an empty struct." access="public" returntype="struct" output="false">
 	<cfargument name="testname" hint="the name of the test to get the variations for." type="string" required="Yes">
-	<cfreturn getVisitor().getCombination(arguments.testName) />
+	<cfscript>
+		if(getVisitor().hasID(arguments.testName))
+		{
+			return getVisitor().getCombination(arguments.testName);
+		}
+
+		return {};
+    </cfscript>
 </cffunction>
 
 <!------------------------------------------- PACKAGE ------------------------------------------->
