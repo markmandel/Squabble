@@ -16,10 +16,11 @@
 
 <cfcomponent hint="Service Layer for Squabble. To be instantiated on applications start up as a singleton." output="false" accessors="true">
 
-<cfproperty name="testConfigurations" type="struct" />
-<cfproperty name="testCombinations" type="struct" />
-<cfproperty name="gateway" type="any">
-<cfproperty name="visitor" type="any">
+<cfproperty name="testConfigurations" type="struct" hint="The test configurations"/>
+<cfproperty name="testCombinations" type="struct" hint="The set of combinations for each test"/>
+<cfproperty name="gateway" type="any" hint="Data access gateway">
+<cfproperty name="visitor" type="any" hint="The visitor details">
+<cfproperty name="browser" type="any" hint="The browser details">
 
 <!------------------------------------------- PUBLIC ------------------------------------------->
 
@@ -31,6 +32,7 @@
 
 		setGateway(new SquabbleGateway());
 		setVisitor(new Visitor());
+		setBrowser(new util.Browser());
 
 		return this;
 	</cfscript>
@@ -63,6 +65,8 @@
 			access="public" returntype="void" output="false">
 	<cfargument name="testName" hint="the name of the test." type="string" required="Yes">
 	<cfscript>
+		//Question: would this section be easier to read as a single if with OR statement, or as it is?
+
 		//escape out if no cookies
 		if(!getVisitor().isEnabled())
 		{
@@ -71,6 +75,12 @@
 
 		//make it easier for testing, as deleting a cookie just makes it an empty string, rather than removing the key.
 		if(getVisitor().hasID(arguments.testName))
+		{
+			return;
+		}
+
+		//if it's a crawler, then dump it.
+		if(getBrowser().isCrawler())
 		{
 			return;
 		}

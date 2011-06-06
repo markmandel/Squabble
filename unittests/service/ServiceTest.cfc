@@ -351,6 +351,37 @@
 	</cftransaction>
 </cffunction>
 
+<cffunction name="crawlerConversionTest" hint="test that a crawler will not cause a visitor" access="public" returntype="void" output="false">
+	<cftransaction>
+		<cfscript>
+			var testName = createUUID();
+
+			//mock out browser
+			var browser = mock(service.getBrowser());
+
+			browser.isCrawler().returns(true);
+			service.setBrowser(browser);
+
+			service.registerTest(testName, testConfig, conversionConfigs);
+			service.runTest(testName);
+	    </cfscript>
+
+	    <cfquery name="local.count">
+			select count(id) as total
+			from
+			squabble_visitors
+			where
+			test_name = <cfqueryparam value="#testName#" cfsqltype="cf_sql_varchar">
+		</cfquery>
+
+		<cfscript>
+			assertEquals(0, count.total);
+        </cfscript>
+
+    	<cftransaction action="rollback" />
+	</cftransaction>
+</cffunction>
+
 <!------------------------------------------- PACKAGE ------------------------------------------->
 
 <!------------------------------------------- PRIVATE ------------------------------------------->
