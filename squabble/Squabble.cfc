@@ -32,6 +32,7 @@
 
 		setGateway(new SquabbleGateway());
 		setVisitor(new Visitor());
+		setBrowser(new util.Browser());
 
 		return this;
 	</cfscript>
@@ -64,6 +65,8 @@
 			access="public" returntype="void" output="false">
 	<cfargument name="testName" hint="the name of the test." type="string" required="Yes">
 	<cfscript>
+		//Question: would this section be easier to read as a single if with OR statement, or as it is?
+
 		//escape out if no cookies
 		if(!getVisitor().isEnabled())
 		{
@@ -72,6 +75,12 @@
 
 		//make it easier for testing, as deleting a cookie just makes it an empty string, rather than removing the key.
 		if(getVisitor().hasID(arguments.testName))
+		{
+			return;
+		}
+
+		//if it's a crawler, then dump it.
+		if(getBrowser().isCrawler())
 		{
 			return;
 		}
