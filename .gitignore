@@ -1,0 +1,6 @@
+#ignore these files
+.*
+!.gitignore
+!.htaccess
+/settings.xml
+*.iml
