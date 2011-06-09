@@ -53,11 +53,6 @@
 <cffunction name="getID" hint="get the current visitor ID" access="public" returntype="string" output="false">
 	<cfargument name="testname" hint="the name of the test to get the combinations for." type="string" required="Yes">
 	<cfscript>
-		if(!isEnabled())
-		{
-			return "";
-		}
-
 		return cookie[createTestIDCookieKey(arguments.testName)];
     </cfscript>
 </cffunction>
@@ -77,11 +72,6 @@
 <cffunction name="getCombination" hint="get the current visitor combination. If an inactive visitor, returns an empty struct." access="public" returntype="struct" output="false">
 	<cfargument name="testname" hint="the name of the test to get the variations for." type="string" required="Yes">
 	<cfscript>
-		if(!isEnabled())
-		{
-			return {};
-		}
-
 		if(structKeyExists(url, meta.const.PREVIEW_KEY) && url.squabble_enable_preview eq arguments.testName)
 		{
 			return getPreviewCombination();
@@ -89,14 +79,6 @@
 
 		return deserializeJSON(cookie[createTestCombinationCookieKey(arguments.testName)]);
     </cfscript>
-</cffunction>
-
-<cffunction name="isEnabled" hint="Whether or not we can track this user. At the moment this defaults to whether or not cookies are enabled.
-			<br/>Credits to Alex Baban for his cflib udf 'isCookiesEnabled'"
-			access="public" returntype="boolean" output="false">
-	<!---<cfreturn IsBoolean(URLSessionFormat("True")) />--->
-	<!--- for now, just assume cookies, not sure what else to do about it --->
-	<cfreturn true />
 </cffunction>
 
 <!------------------------------------------- PACKAGE ------------------------------------------->
