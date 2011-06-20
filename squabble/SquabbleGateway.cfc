@@ -196,6 +196,28 @@
 </cffunction>
 
 
+<cffunction name="getTestSections" hint="Returns an ordered list of sections for a given test" access="public" returntype="string" output="false">
+	<cfargument name="testName" type="string" required="true" hint="The test name to return data for">
+	<cfset var sections = "">
+	<cfset var getTestSectionsQuery = "">
+
+	<cfquery name="getTestSectionsQuery">
+		SELECT DISTINCT squabble_combinations.section_name
+		FROM squabble_visitors
+		JOIN squabble_combinations
+		ON squabble_combinations.visitor_id = squabble_visitors.id
+		WHERE squabble_visitors.test_name = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.testName#">
+		ORDER BY squabble_combinations.section_name
+	</cfquery>
+
+	<cfif getTestSectionsQuery.recordCount GT 0>
+		<cfset sections = valueList(getTestSectionsQuery.section_name)>
+	</cfif>
+
+	<cfreturn sections>
+</cffunction>
+
+
 <cffunction name="getTotalConversions" hint="Returns a count of all conversions, revenue and units" access="public" returntype="query" output="false">
 	<cfargument name="testName" type="string" required="true" hint="The test name to return data for">
 	<cfset var getTotalConversionsQuery = "">

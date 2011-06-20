@@ -40,18 +40,39 @@
 		* { margin: 0; padding: 0; font-family: inherit; }
 		html { height: 100%; width: 100%; }
 		body { margin: 20px; font-family: Ubuntu, Arial, Helvetica; font-size: 9pt; }
+		h2 { margin-bottom: 5px; }
 
 		#testData { margin-top: 20px; }
-
 		#testData table { margin-top: 15px; border: solid 1px #ccc; }
+
+		#previewURL { width: 350px; }
+
 		th { font-weight: bold; }
 		td, th { text-align: center; padding: 6px 12px; }
 		.header { background-color: #ddd; }
 		.odd { background-color: #efefef;  }
 		.green {color: #00CC00; }
 		.red {color: #CC0000; }
-
+		.combination-name { font-weight: bold; cursor: pointer; text-decoration: underline; }
+		.combination-name:hover { text-decoration: none; }
 	</style>
+
+	<script type="text/javascript">
+		function previewCombination(qs)
+		{
+			var baseURL = document.getElementById('previewURL').value;
+
+			if (baseURL.length > 0)
+			{
+				var qsSelector = baseURL.indexOf("?") == -1 ? "?" : "&";
+				window.open(baseURL + qsSelector + qs);
+			}
+			else
+			{
+				alert('Please enter a base URL!');
+			}
+		}
+	</script>
 </head>
 <body>
 	<form method="post">
@@ -75,11 +96,14 @@
 			<cfscript>
 				totalConversions = application.squabble.getGateway().getTotalConversions(form.testName);
 				conversions = totalConversions.recordcount EQ 1 AND totalConversions.total_conversions GT 0;
+				sections = application.squabble.getGateway().getTestSections(form.testName);
 			</cfscript>
 
 			<div id="testData">
 				<cfoutput>
 					<h2>#form.testName#</h2>
+
+					Preview URL: <input type="text" id="previewURL" />
 
 					<table cellspacing="0">
 						<tr class="header">
@@ -123,10 +147,11 @@
 						goalTotalConversions = application.squabble.getGateway().getGoalTotalConversions(form.testName);
 
 						/* Debug
+							writeDump(var=sections, expand=false)
 							writeDump(var=combinationTotalVisitors, expand=false);
 							writeDump(var=combinationTotalConversions, expand=false);
 							writeDump(var=goalTotalConversions, expand=false);
-						*/
+						 */
 					</cfscript>
 
 					<!--- Work out if we can measure against control --->
@@ -199,7 +224,17 @@
 
 								<tr <cfif combinationCount MOD 2 EQ 0>class="odd"</cfif>>
 									<cfif goalCount EQ 1>
-										<td rowspan="#totalGoals#"><strong>#combination#</strong></td>
+										<td rowspan="#totalGoals#">
+											<cfset combinationPreviewQS = "squabble_enable_preview=#form.testName#">
+											<cfset sectionCount = 0>
+
+											<cfloop list="#combination#" index="comboName">
+												<cfset sectionCount++>
+												<cfset combinationPreviewQS = listAppend(combinationPreviewQS, "squabble_#listGetAt(sections, sectionCount)#=#comboName#", "&")>
+											</cfloop>
+
+											<a href="javascript:previewCombination('#combinationPreviewQS#')" class="combination-name">#combination#</a>
+										</td>
 										<td rowspan="#totalGoals#">#combinationVisitors#</td>
 										<td rowspan="#totalGoals#">#combinationConversions#</td>
 										<td rowspan="#totalGoals#">#combinationConversionRate#%</td>
