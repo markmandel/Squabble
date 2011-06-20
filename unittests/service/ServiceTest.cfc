@@ -29,8 +29,6 @@
 				fooSection = [ "test1", "test2", "test3" ]
 				,barSection = [ "test4", "test5", "test6" ]
 			};
-
-		conversionConfigs = ["conversion1", "conversion2"];
     </cfscript>
 </cffunction>
 
@@ -39,7 +37,6 @@
 		var expected = {
 			testname = "foo"
 			,variations = StructCopy(testConfig)
-			,conversions = conversionConfigs
 			,percentageVisitorTraffic = 99
 		};
 
@@ -47,7 +44,7 @@
 		ArrayPrepend(expected.variations.barSection, "control");
 		ArrayPrepend(expected.variations.fooSection, "control");
 
-		service.registerTest("foo", testConfig, conversionConfigs, 99);
+		service.registerTest("foo", testConfig, 99);
 
 		//use underlying equals, as built in assertEquals is not great for structs.
 		assertTrue(expected.equals(service.getTestConfigurations().foo));
@@ -56,9 +53,9 @@
 
 <cffunction name="testListTests" hint="testing list tests" access="public" returntype="void" output="false">
 	<cfscript>
-		service.registerTest("foo", testConfig, conversionConfigs, 99);
-		service.registerTest("bar", testConfig, conversionConfigs);
-		service.registerTest("yerk", testConfig, conversionConfigs);
+		service.registerTest("foo", testConfig, 99);
+		service.registerTest("bar", testConfig);
+		service.registerTest("yerk", testConfig);
 
 		var expected = ["foo", "bar", "yerk"];
 
@@ -71,7 +68,6 @@
 		var expected = {
 			testname = "foo"
 			,variations = StructCopy(testConfig)
-			,conversions = conversionConfigs
 			,percentageVisitorTraffic = 99
 		};
 
@@ -79,7 +75,7 @@
 		ArrayPrepend(expected.variations.barSection, "control");
 		ArrayPrepend(expected.variations.fooSection, "control");
 
-		service.registerTest("foo", testConfig, conversionConfigs, 99);
+		service.registerTest("foo", testConfig, 99);
 
 		//use underlying equals, as built in assertEquals is not great for structs.
 		assertTrue(expected.equals(service.getTestConfig("foo")));
@@ -95,7 +91,7 @@
 		var myTestConfig = duplicate(testConfig);
 		StructDelete(myTestConfig, "fooSection");
 
-		service.registerTest("bar", myTestConfig, conversionConfigs);
+		service.registerTest("bar", myTestConfig);
 		var combinations = service.listTestCombinations("bar");
 
 		var comboNumber = 4; //control +1
@@ -123,7 +119,7 @@
 
 
 		//test 2 levels next
-		service.registerTest("foo", duplicate(testConfig), conversionConfigs, 99);
+		service.registerTest("foo", duplicate(testConfig), 99);
 		var combinations = service.listTestCombinations("foo");
 
 		debug(combinations);
@@ -154,7 +150,7 @@
 		myTestConfig = duplicate(testConfig);
 		myTestConfig.gandalf = [ "test7", "test8", "test9", "test10" ];
 
-		service.registerTest("gandalf", myTestConfig, conversionConfigs);
+		service.registerTest("gandalf", myTestConfig);
 
 		var combinations = service.listTestCombinations("gandalf");
 
@@ -185,7 +181,7 @@
 <cffunction name="testDefaultRunTest" hint="test running a given test. (integration test)" access="public" returntype="void" output="false">
 	<cftransaction>
 		<cfscript>
-			service.registerTest("foo", testConfig, conversionConfigs);
+			service.registerTest("foo", testConfig);
 
 			var previousID = "";
 			var previousVar = "";
@@ -223,7 +219,7 @@
 		<cfscript>
 			clearSquabbleCookies();
 
-			service.registerTest("foo", testConfig, conversionConfigs);
+			service.registerTest("foo", testConfig);
 
 			service.runTest("foo");
 
@@ -251,7 +247,7 @@
 		<cfscript>
 			clearSquabbleCookies();
 
-			service.registerTest("foo", testConfig, conversionConfigs);
+			service.registerTest("foo", testConfig);
 			service.runTest("foo");
 
 			var visitorID = service.getCurrentVisitorID("foo");
@@ -272,7 +268,7 @@
 		<cfscript>
 			clearSquabbleCookies();
 
-			service.registerTest("foo", testConfig, conversionConfigs);
+			service.registerTest("foo", testConfig);
 			service.runTest("foo");
 
 			service.convert("foo", "PayPal Checkout", 12);
@@ -290,7 +286,7 @@
 <cffunction name="testPercentageVisitors" hint="test for percentage of visitors" access="public" returntype="void" output="false">
 	<cftransaction>
 		<cfscript>
-			service.registerTest("foo", testConfig, conversionConfigs, "50");
+			service.registerTest("foo", testConfig, "50");
 			var active = 0;
 			var inactive = 0;
 
@@ -326,7 +322,7 @@
 		<cfscript>
 			clearSquabbleCookies();
 
-			service.registerTest("foo", testConfig, conversionConfigs);
+			service.registerTest("foo", testConfig);
 
 			// Try a conversion before running before even running a test (there should be no error thrown)
 			service.convert("foo", "Checkout");
@@ -363,7 +359,7 @@
 			browser.isCrawler().returns(true);
 			service.setBrowser(browser);
 
-			service.registerTest(testName, testConfig, conversionConfigs);
+			service.registerTest(testName, testConfig);
 			service.runTest(testName);
 
 			//make sure asking for a conversion doesn't break, should return an empty struct

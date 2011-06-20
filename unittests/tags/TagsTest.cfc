@@ -31,8 +31,6 @@
 				fooSection = [ "test1", "test2", "test3" ]
 				,barSection = [ "test4", "test5", "test6" ]
 			};
-
-		conversionConfigs = ["conversion1", "conversion2"];
     </cfscript>
 </cffunction>
 
@@ -41,7 +39,7 @@
 		<cfscript>
 			clearSquabbleCookies();
 
-			service.registerTest("foo", testConfig, conversionConfigs);
+			service.registerTest("foo", testConfig);
 			service.runTest("foo");
 
 			var currentCombination = service.getCurrentCombination("foo");
@@ -97,7 +95,7 @@
 			visitor.getCombination().returns({ barSection = "test4" });
 			service.setVisitor(visitor);
 
-			service.registerTest("foo", testConfig, conversionConfigs);
+			service.registerTest("foo", testConfig);
 			service.runTest("foo");
 
 			var expectedFooContent = "control content";
@@ -128,7 +126,7 @@
 		<cfscript>
 			clearSquabbleCookies();
 
-			service.registerTest("foo", testConfig, conversionConfigs);
+			service.registerTest("foo", testConfig);
 			service.runTest("foo");
 
 			var visitorID = service.getCurrentVisitorID("foo");
@@ -168,7 +166,7 @@
 		<cfscript>
 			clearSquabbleCookies();
 
-			service.registerTest("foo", testConfig, conversionConfigs);
+			service.registerTest("foo", testConfig);
 			service.runTest("foo");
 
 			var visitorID = service.getCurrentVisitorID("foo");

@@ -42,7 +42,6 @@
 	<cfargument name="testName" hint="the name of the test. (500 character limit)" type="string" required="Yes">
 	<cfargument name="variations" hint="Structure of variations. Should be in the format: { sectionName = [ variationName, variationName, variationName] }. Variation names should not include 'control', as it is a reserved word"
 			   	type="struct" required="Yes">
-	<cfargument name="conversions" hint="array of names of conversion endpoints" type="array" required="Yes">
 	<cfargument name="percentageVisitorTraffic" hint="A percentage from 0 to 100 of the amount of visitor traffic should be included in this test. Defaults to 100 percent"
 			   type="numeric" required="No" default="100">
 	<cfscript>
@@ -66,12 +65,6 @@
 	<cfargument name="testName" hint="the name of the test." type="string" required="Yes">
 	<cfscript>
 		//Question: would this section be easier to read as a single if with OR statement, or as it is?
-
-		//escape out if no cookies
-		if(!getVisitor().isEnabled())
-		{
-			return;
-		}
 
 		//make it easier for testing, as deleting a cookie just makes it an empty string, rather than removing the key.
 		if(getVisitor().hasID(arguments.testName))
