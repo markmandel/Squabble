@@ -18,6 +18,7 @@
 
 <cfproperty name="testConfigurations" type="struct" hint="The test configurations"/>
 <cfproperty name="testCombinations" type="struct" hint="The set of combinations for each test"/>
+<cfproperty name="disabledTests" type="struct" hint="List of disabled tests">
 <cfproperty name="gateway" type="any" hint="Data access gateway">
 <cfproperty name="visitor" type="any" hint="The visitor details">
 <cfproperty name="browser" type="any" hint="The browser details">
@@ -29,6 +30,7 @@
 		setTestConfigurations({});
 		setTestCombinations({});
 		setTestVariationPool({});
+		setDisabledTests({});
 
 		setGateway(new SquabbleGateway());
 		setVisitor(new Visitor());
@@ -65,6 +67,12 @@
 	<cfargument name="testName" hint="the name of the test." type="string" required="Yes">
 	<cfscript>
 		//Question: would this section be easier to read as a single if with OR statement, or as it is?
+
+		//skip disabled
+		if(testIsDisabled(arguments.testname))
+		{
+			return;
+		}
 
 		//make it easier for testing, as deleting a cookie just makes it an empty string, rather than removing the key.
 		if(getVisitor().hasCombination(arguments.testName))
@@ -138,6 +146,13 @@
 			return;
 		}
 
+		//if the test is disabled, ignore them
+		if(testIsDisabled(arguments.testname))
+		{
+			return;
+		}
+
+
 		//or if they have been skipped over.
 		if(structIsEmpty(getCurrentCombination(arguments.testName)))
 		{
@@ -148,9 +163,27 @@
 	</cfscript>
 </cffunction>
 
+<cffunction name="disableTest" hint="A quick and easy way to disable a test without having to go and remove all the aspects of the test from your application"
+			access="public" returntype="void" output="false">
+	<cfargument name="testname" hint="the name of the test to disable." type="string" required="Yes">
+	<cfscript>
+		getDisabledTests()[arguments.testname] = 1;
+    </cfscript>
+</cffunction>
+
+<cffunction name="testIsDisabled" hint="Whether or not a given test is disabled" access="public" returntype="boolean" output="false">
+	<cfargument name="testname" hint="the name of the test potentially disabled." type="string" required="Yes">
+	<cfreturn structKeyExists(getDisabledTests(), arguments.testName) />
+</cffunction>
+
 <cffunction name="getCurrentVisitorID" hint="get the current visitor ID" access="public" returntype="string" output="false">
 	<cfargument name="testname" hint="the name of the test to get the combinations for." type="string" required="Yes">
 	<cfscript>
+		if(testIsDisabled(arguments.testname))
+		{
+			return "";
+		}
+
 		if(getVisitor().hasCombination(arguments.testName))
 		{
 			return getVisitor().getID(arguments.testName);
@@ -163,6 +196,11 @@
 <cffunction name="getCurrentCombination" hint="get the current visitor combination. If an inactive visitor, returns an empty struct." access="public" returntype="struct" output="false">
 	<cfargument name="testname" hint="the name of the test to get the variations for." type="string" required="Yes">
 	<cfscript>
+		if(testIsDisabled(arguments.testname))
+		{
+			return {};
+		}
+
 		if(getVisitor().hasCombination(arguments.testName))
 		{
 			return getVisitor().getCombination(arguments.testName);

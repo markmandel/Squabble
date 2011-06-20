@@ -19,7 +19,7 @@
 
 <cfoutput>
 <cfscript>
-	base = expandPath("/squabble");
+	base = expandPath("../../../squabble");
 	path = expandPath("../../api/squabble");
 
 	colddoc = createObject("component", "colddoc.ColdDoc").init();
@@ -29,6 +29,7 @@
 	colddoc.generate(base, "squabble");
 </cfscript>
 </cfoutput>
+<cfdump var="#base#">
 <h1>Done!</h1>
 
 <p>

@@ -21,6 +21,8 @@
 <cfscript>
 	this.name = "Squabble Documentation";
 	this.sessionmanagement = false;
+
+	this.mappings["/squabble"] = expandPath("../../../squabble");
 </cfscript>
 
 </cfcomponent>

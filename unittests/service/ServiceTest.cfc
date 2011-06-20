@@ -383,6 +383,29 @@
 	</cftransaction>
 </cffunction>
 
+<cffunction name="testDisabled" hint="test disabled" access="public" returntype="void" output="false">
+	<cftransaction>
+		<cfscript>
+				clearSquabbleCookies();
+
+				var visitors = service.getGateway().getTotalVisitors("foo");
+				var conversion = service.getGateway().getVisitorConversions("foo");
+
+				service.registerTest("foo", testConfig);
+
+				service.disableTest("foo");
+
+				service.runTest("foo");
+				service.convert("foo", "PayPal Checkout");
+
+				assertEquals(visitors, service.getGateway().getTotalVisitors("foo"));
+				assertEquals(conversion, service.getGateway().getVisitorConversions("foo"));
+        </cfscript>
+
+		<cftransaction action="rollback" />
+	</cftransaction>
+</cffunction>
+
 <!------------------------------------------- PACKAGE ------------------------------------------->
 
 <!------------------------------------------- PRIVATE ------------------------------------------->
