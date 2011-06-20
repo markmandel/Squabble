@@ -24,7 +24,7 @@
 		var cookies = structKeyArray(cookie);
     </cfscript>
     <cfloop array="#cookies#" index="key">
-		<cfif LCase(key).startsWith("squabble")>
+		<cfif LCase(key).startsWith("s-")>
 			<cfset structDelete(cookie, key)>
 		</cfif>
     </cfloop>

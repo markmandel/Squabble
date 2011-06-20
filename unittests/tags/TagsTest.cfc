@@ -91,7 +91,7 @@
 			var visitor = mock(service.getVisitor());
 
 			visitor.isEnabled().returns(true);
-			visitor.hasID("foo").returns(true);
+			visitor.hasCombination("foo").returns(true);
 			visitor.getCombination().returns({ barSection = "test4" });
 			service.setVisitor(visitor);
 

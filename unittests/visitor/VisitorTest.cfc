@@ -31,8 +31,7 @@
 		combination = { foo = "bar"};
 
 		//gate
-		visitor.setID("foo", id);
-		visitor.setCombination("foo", combination);
+		visitor.setCombination("foo", id, combination);
 
 		assertEquals(id, visitor.getID("foo"));
 		assertTrue(combination.equals(visitor.getCombination("foo")));

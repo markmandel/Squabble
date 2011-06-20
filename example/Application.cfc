@@ -36,9 +36,7 @@
 				, barSection = [ "test4", "test5", "test6" ]
 			};
 
-		conversionConfigs = ["conversion1", "conversion2"];
-
-		application.squabble.registerTest("foo", testConfig, conversionConfigs);
+		application.squabble.registerTest("foo", testConfig);
     </cfscript>
 </cffunction>
 
@@ -70,7 +68,7 @@
 		var cookies = structKeyArray(cookie);
     </cfscript>
     <cfloop array="#cookies#" index="key">
-		<cfif LCase(key).startsWith("squabble")>
+		<cfif LCase(key).startsWith("s-")>
 			<cfset structDelete(cookie, key)>
 		</cfif>
     </cfloop>

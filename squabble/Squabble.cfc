@@ -67,8 +67,9 @@
 		//Question: would this section be easier to read as a single if with OR statement, or as it is?
 
 		//make it easier for testing, as deleting a cookie just makes it an empty string, rather than removing the key.
-		if(getVisitor().hasID(arguments.testName))
+		if(getVisitor().hasCombination(arguments.testName))
 		{
+			getVisitor().deserialiseCombination(arguments.testName);
 			return;
 		}
 
@@ -91,8 +92,7 @@
 			var id = createUUID();
 		}
 
-		getVisitor().setID(arguments.testName, id);
-		getVisitor().setCombination(arguments.testName, variation);
+		getVisitor().setCombination(arguments.testName, id, variation);
     </cfscript>
 </cffunction>
 
@@ -133,7 +133,7 @@
 	<cfargument name="units" hint="The unit amount to record for this conversion" type="string" required="false" default="">
 	<cfscript>
 		//if for whatever reason they don't have an id, ignore them.
-		if(!getVisitor().hasID(arguments.testName))
+		if(!getVisitor().hasCombination(arguments.testName))
 		{
 			return;
 		}
@@ -151,7 +151,7 @@
 <cffunction name="getCurrentVisitorID" hint="get the current visitor ID" access="public" returntype="string" output="false">
 	<cfargument name="testname" hint="the name of the test to get the combinations for." type="string" required="Yes">
 	<cfscript>
-		if(getVisitor().hasID(arguments.testName))
+		if(getVisitor().hasCombination(arguments.testName))
 		{
 			return getVisitor().getID(arguments.testName);
 		}
@@ -163,7 +163,7 @@
 <cffunction name="getCurrentCombination" hint="get the current visitor combination. If an inactive visitor, returns an empty struct." access="public" returntype="struct" output="false">
 	<cfargument name="testname" hint="the name of the test to get the variations for." type="string" required="Yes">
 	<cfscript>
-		if(getVisitor().hasID(arguments.testName))
+		if(getVisitor().hasCombination(arguments.testName))
 		{
 			return getVisitor().getCombination(arguments.testName);
 		}

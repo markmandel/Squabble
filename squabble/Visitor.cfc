@@ -33,17 +33,18 @@
 <cffunction name="init" hint="Constructor" access="public" returntype="Visitor" output="false">
 	<cfscript>
 		//don't do get/set functions just for performance for cookie names.
-		variables.cookieIDNames = {};
 		variables.cookieComboNames = {};
+
+		setThreadLocalCombination(createObject("java", "java.lang.ThreadLocal").init());
 
 		return this;
 	</cfscript>
 </cffunction>
 
-<cffunction name="hasID" hint="Whether or not the current visitor has been assigned an id yet or not" access="public" returntype="boolean" output="false">
-	<cfargument name="testname" hint="the name of the test to get the combinations for." type="string" required="Yes">
+<cffunction name="hasCombination" hint="Whether or not the current visitor has been assigned an id and a combination yet" access="public" returntype="boolean" output="false">
+	<cfargument name="testname" hint="the name of the test we are looking at." type="string" required="Yes">
 	<cfscript>
-		var key = createTestIDCookieKey(arguments.testName);
+		var key = createTestCombinationCookieKey(arguments.testName);
 
 		//have to do length, as deleting the cookie just makes the length 0.
 		return (structKeyExists(cookie, key) AND Len(cookie[key]));
@@ -53,20 +54,26 @@
 <cffunction name="getID" hint="get the current visitor ID" access="public" returntype="string" output="false">
 	<cfargument name="testname" hint="the name of the test to get the combinations for." type="string" required="Yes">
 	<cfscript>
-		return cookie[createTestIDCookieKey(arguments.testName)];
+		return getThreadLocalCombination().get()[arguments.testName].id;
     </cfscript>
-</cffunction>
-
-<cffunction name="setID" hint="set the ID for the current visitor" access="public" returntype="void" output="false">
-	<cfargument name="testname" hint="the name of the test to get the combinations for." type="string" required="Yes">
-	<cfargument name="id" hint="the id to set" type="string" required="Yes">
-	<cfcookie name="#createTestIDCookieKey(arguments.testName)#" value="#arguments.id#" expires="183">
 </cffunction>
 
 <cffunction name="setCombination" hint="set the combination for the current visitor" access="public" returntype="void" output="false">
 	<cfargument name="testname" hint="the name of the test to get the combinations for." type="string" required="Yes">
+	<cfargument name="id" hint="the id to set" type="string" required="Yes">
 	<cfargument name="combination" hint="The combination to set" type="struct" required="Yes">
-	<cfcookie name="#createTestCombinationCookieKey(arguments.testName)#" value="#serializeJSON(arguments.combination)#" expires="183">
+
+	<cfscript>
+		var details = {
+			id = arguments.id
+			,c = arguments.combination
+		};
+    </cfscript>
+
+	<cfcookie name="#createTestCombinationCookieKey(arguments.testName)#" value="#serializeJSON(details)#" expires="183">
+
+	<!--- Since it's been set, let's make it available --->
+	<cfset deserialiseCombination(arguments.testName)>
 </cffunction>
 
 <cffunction name="getCombination" hint="get the current visitor combination. If an inactive visitor, returns an empty struct." access="public" returntype="struct" output="false">
@@ -77,11 +84,30 @@
 			return getPreviewCombination();
 		}
 
-		return deserializeJSON(cookie[createTestCombinationCookieKey(arguments.testName)]);
+		return getThreadLocalCombination().get()[arguments.testName].c;
     </cfscript>
 </cffunction>
 
 <!------------------------------------------- PACKAGE ------------------------------------------->
+
+<cffunction name="deserialiseCombination" hint="deserialise the combination, and store it in a thread local object so it doesn't need to be deserialised on every call.
+												<br/>Call this before calling getID() or getCombination()"
+			access="package" returntype="void" output="false">
+	<cfargument name="testname" hint="the name of the test to deserialise" type="string" required="Yes">
+	<cfscript>
+		//store all our bits in a thread local variable.
+		var combos = getThreadLocalCombination().get();
+
+		if(isNull(combos))
+		{
+			combos = {};
+		}
+
+		combos[arguments.testName] = deserializeJSON(cookie[createTestCombinationCookieKey(arguments.testName)]);
+
+		getThreadLocalCombination().set(combos);
+    </cfscript>
+</cffunction>
 
 <!------------------------------------------- PRIVATE ------------------------------------------->
 
@@ -107,28 +133,26 @@
 
 <!--- cache em, so as not to be creating tons of strings all the time --->
 
-<cffunction name="createTestIDCookieKey" hint="create the key for the cookie, that stores the current users id" access="private" returntype="string" output="false">
-	<cfargument name="testName" hint="the name of the test." type="string" required="Yes">
-	<cfscript>
-		if(!structKeyExists(cookieIDNames, arguments.testName))
-		{
-			cookieIDNames[arguments.testName] = "squabble-#hash(arguments.testName)#-id";
-		}
-
-		return cookieIDNames[arguments.testName];
-    </cfscript>
-</cffunction>
-
-<cffunction name="createTestCombinationCookieKey" hint="create the key for the cookie, that stores the current users variation" access="private" returntype="string" output="false">
+<cffunction name="createTestCombinationCookieKey" hint="create the key for the cookie, that stores the current users variation and id" access="private" returntype="string" output="false">
 	<cfargument name="testName" hint="the name of the test." type="string" required="Yes">
 	<cfscript>
 		if(!structKeyExists(cookieComboNames, arguments.testName))
 		{
-			cookieComboNames[arguments.testName] = "squabble-#hash(arguments.testName)#-c";
+			cookieComboNames[arguments.testName] = "s-#hash(arguments.testName)#";
 		}
 
 		return cookieComboNames[arguments.testName];
     </cfscript>
+</cffunction>
+
+<!--- want this to be private --->
+<cffunction name="getThreadLocalCombination" access="private" returntype="any" output="false">
+	<cfreturn instance.threadLocalCombination />
+</cffunction>
+
+<cffunction name="setThreadLocalCombination" access="private" returntype="void" output="false">
+	<cfargument name="threadLocalCombination" type="any" required="true">
+	<cfset instance.threadLocalCombination = arguments.threadLocalCombination />
 </cffunction>
 
 </cfcomponent>
