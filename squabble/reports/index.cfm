@@ -103,7 +103,7 @@
 				<cfoutput>
 					<h2>#form.testName#</h2>
 
-					Preview URL: <input type="text" id="previewURL" />
+					Preview URL: <input type="text" id="previewURL" value="http://#cgi.SERVER_NAME#:#cgi.SERVER_PORT#/" />
 
 					<table cellspacing="0">
 						<tr class="header">
