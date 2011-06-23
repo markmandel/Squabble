@@ -283,6 +283,39 @@
 	</cftransaction>
 </cffunction>
 
+<cffunction name="convertAllTest" hint="Ensures the convert method correctly inserts a conversion record for all active tests" access="public" returntype="void" output="false">
+	<cftransaction>
+		<cfscript>
+			clearSquabbleCookies();
+
+			// Register 3 tests and disable one of them
+			service.registerTest("bart", testConfig);
+			service.registerTest("lisa", testConfig);
+			service.registerTest("maggie", testConfig);
+			service.disableTest("lisa");
+
+			// Run all 3 tests (although only 2 will actually run as 'lisa' is disabled)
+			service.runTest("bart");
+			service.runTest("lisa");
+			service.runTest("maggie");
+
+			// Convert for all tests
+			service.convertAll("Simpsons Checkout", 12, 5);
+
+			var bartConversions = service.getGateway().getVisitorConversions(service.getCurrentVisitorID("bart"));
+
+			assertEquals(1, bartConversions.recordcount);
+			assertEquals(0, service.getGateway().getVisitorConversions(service.getCurrentVisitorID("lisa")).recordcount);
+			assertEquals(1, service.getGateway().getVisitorConversions(service.getCurrentVisitorID("maggie")).recordcount);
+
+			assertEquals("Simpsons Checkout", bartConversions.conversion_name);
+			assertEquals(12, bartConversions.conversion_value);
+			assertEquals(5, bartConversions.conversion_units);
+	    </cfscript>
+	    <cftransaction action="rollback" />
+	</cftransaction>
+</cffunction>
+
 <cffunction name="testPercentageVisitors" hint="test for percentage of visitors" access="public" returntype="void" output="false">
 	<cftransaction>
 		<cfscript>
@@ -392,8 +425,10 @@
 				var conversion = service.getGateway().getVisitorConversions("foo");
 
 				service.registerTest("foo", testConfig);
+				assertFalse(service.isTestDisabled("foo"));
 
 				service.disableTest("foo");
+				assertTrue(service.isTestDisabled("foo"));
 
 				service.runTest("foo");
 				service.convert("foo", "PayPal Checkout");

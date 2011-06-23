@@ -69,7 +69,7 @@
 		//Question: would this section be easier to read as a single if with OR statement, or as it is?
 
 		//skip disabled
-		if(testIsDisabled(arguments.testname))
+		if(isTestDisabled(arguments.testname))
 		{
 			return;
 		}
@@ -147,7 +147,7 @@
 		}
 
 		//if the test is disabled, ignore them
-		if(testIsDisabled(arguments.testname))
+		if(isTestDisabled(arguments.testname))
 		{
 			return;
 		}
@@ -163,6 +163,22 @@
 	</cfscript>
 </cffunction>
 
+<cffunction name="convertAll" hint="Track a conversion for all registered tests" access="public" returntype="void" output="false">
+	<cfargument name="name" hint="The name/type of this conversion" type="string" required="false" default="The name of this conversion">
+	<cfargument name="value" hint="The value to record for this conversion" type="string" required="false" default="">
+	<cfargument name="units" hint="The unit amount to record for this conversion" type="string" required="false" default="">
+	<cfscript>
+		var registeredTests = listTests();
+		var registeredTestCount = arrayLen(registeredTests);
+		var i = 1;
+
+		for (i; i <= registeredTestCount; i++)
+		{
+			convert(registeredTests[i], arguments.name, arguments.value, arguments.units);
+		}
+	</cfscript>
+</cffunction>
+
 <cffunction name="disableTest" hint="A quick and easy way to disable a test without having to go and remove all the aspects of the test from your application"
 			access="public" returntype="void" output="false">
 	<cfargument name="testname" hint="the name of the test to disable." type="string" required="Yes">
@@ -171,7 +187,7 @@
     </cfscript>
 </cffunction>
 
-<cffunction name="testIsDisabled" hint="Whether or not a given test is disabled" access="public" returntype="boolean" output="false">
+<cffunction name="isTestDisabled" hint="Whether or not a given test is disabled" access="public" returntype="boolean" output="false">
 	<cfargument name="testname" hint="the name of the test potentially disabled." type="string" required="Yes">
 	<cfreturn structKeyExists(getDisabledTests(), arguments.testName) />
 </cffunction>
@@ -179,7 +195,7 @@
 <cffunction name="getCurrentVisitorID" hint="get the current visitor ID" access="public" returntype="string" output="false">
 	<cfargument name="testname" hint="the name of the test to get the combinations for." type="string" required="Yes">
 	<cfscript>
-		if(testIsDisabled(arguments.testname))
+		if(isTestDisabled(arguments.testname))
 		{
 			return "";
 		}
@@ -196,7 +212,7 @@
 <cffunction name="getCurrentCombination" hint="get the current visitor combination. If an inactive visitor, returns an empty struct." access="public" returntype="struct" output="false">
 	<cfargument name="testname" hint="the name of the test to get the variations for." type="string" required="Yes">
 	<cfscript>
-		if(testIsDisabled(arguments.testname))
+		if(isTestDisabled(arguments.testname))
 		{
 			return {};
 		}
