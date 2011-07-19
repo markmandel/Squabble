@@ -283,6 +283,22 @@
 	</cftransaction>
 </cffunction>
 
+<cffunction name="convertNoRunTest" hint="Clear everything, and run convert. It should not throw an error" access="public" returntype="void" output="false">
+	<cftransaction>
+		<cfscript>
+			clearSquabbleCookies();
+			service.registerTest("foo", testConfig);
+
+			service.convert("foo", "PayPal Checkout", 12);
+
+			var conversion = service.getGateway().getVisitorConversions(service.getCurrentVisitorID("foo"));
+
+			assertEquals(0, conversion.recordcount);
+	    </cfscript>
+	    <cftransaction action="rollback" />
+	</cftransaction>
+</cffunction>
+
 <cffunction name="convertAllTest" hint="Ensures the convert method correctly inserts a conversion record for all active tests" access="public" returntype="void" output="false">
 	<cftransaction>
 		<cfscript>

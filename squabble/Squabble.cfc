@@ -77,7 +77,6 @@
 		//make it easier for testing, as deleting a cookie just makes it an empty string, rather than removing the key.
 		if(getVisitor().hasCombination(arguments.testName))
 		{
-			getVisitor().deserialiseCombination(arguments.testName);
 			return;
 		}
 

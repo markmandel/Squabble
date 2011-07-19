@@ -35,8 +35,6 @@
 		//don't do get/set functions just for performance for cookie names.
 		variables.cookieComboNames = {};
 
-		setThreadLocalCombination(createObject("java", "java.lang.ThreadLocal").init());
-
 		return this;
 	</cfscript>
 </cffunction>
@@ -54,7 +52,7 @@
 <cffunction name="getID" hint="get the current visitor ID" access="public" returntype="string" output="false">
 	<cfargument name="testname" hint="the name of the test to get the combinations for." type="string" required="Yes">
 	<cfscript>
-		return getThreadLocalCombination().get()[arguments.testName].id;
+		return deserialiseCombination(arguments.testName).id;
     </cfscript>
 </cffunction>
 
@@ -71,9 +69,6 @@
     </cfscript>
 
 	<cfcookie name="#createTestCombinationCookieKey(arguments.testName)#" value="#serializeJSON(details)#" expires="183">
-
-	<!--- Since it's been set, let's make it available --->
-	<cfset deserialiseCombination(arguments.testName)>
 </cffunction>
 
 <cffunction name="getCombination" hint="get the current visitor combination. If an inactive visitor, returns an empty struct." access="public" returntype="struct" output="false">
@@ -84,32 +79,29 @@
 			return getPreviewCombination();
 		}
 
-		return getThreadLocalCombination().get()[arguments.testName].c;
+		return deserialiseCombination(arguments.testName).c;
     </cfscript>
 </cffunction>
 
 <!------------------------------------------- PACKAGE ------------------------------------------->
 
+<!------------------------------------------- PRIVATE ------------------------------------------->
+
 <cffunction name="deserialiseCombination" hint="deserialise the combination, and store it in a thread local object so it doesn't need to be deserialised on every call.
 												<br/>Call this before calling getID() or getCombination()"
-			access="package" returntype="void" output="false">
+			access="private" returntype="struct" output="false">
 	<cfargument name="testname" hint="the name of the test to deserialise" type="string" required="Yes">
 	<cfscript>
-		//store all our bits in a thread local variable.
-		var combos = getThreadLocalCombination().get();
-
-		if(isNull(combos))
+		//store all our bits in a request scope variable.
+		var key = "squabble-" & arguments.testName;
+		if(!StructKeyExists(request, key))
 		{
-			combos = {};
+			request[key] = deserializeJSON(cookie[createTestCombinationCookieKey(arguments.testName)]);
 		}
 
-		combos[arguments.testName] = deserializeJSON(cookie[createTestCombinationCookieKey(arguments.testName)]);
-
-		getThreadLocalCombination().set(combos);
+		return request[key];
     </cfscript>
 </cffunction>
-
-<!------------------------------------------- PRIVATE ------------------------------------------->
 
 <cffunction name="getPreviewCombination" hint="returns a preview combination" access="public" returntype="struct" output="false">
 	<cfscript>
@@ -143,16 +135,6 @@
 
 		return cookieComboNames[arguments.testName];
     </cfscript>
-</cffunction>
-
-<!--- want this to be private --->
-<cffunction name="getThreadLocalCombination" access="private" returntype="any" output="false">
-	<cfreturn instance.threadLocalCombination />
-</cffunction>
-
-<cffunction name="setThreadLocalCombination" access="private" returntype="void" output="false">
-	<cfargument name="threadLocalCombination" type="any" required="true">
-	<cfset instance.threadLocalCombination = arguments.threadLocalCombination />
 </cffunction>
 
 </cfcomponent>

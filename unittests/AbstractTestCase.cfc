@@ -22,6 +22,7 @@
 <cffunction name="clearSquabbleCookies" hint="removes all squabble cookies" access="private" returntype="void" output="false">
 	<cfscript>
 		var cookies = structKeyArray(cookie);
+		structClear(request);
     </cfscript>
     <cfloop array="#cookies#" index="key">
 		<cfif LCase(key).startsWith("s-")>
