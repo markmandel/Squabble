@@ -55,6 +55,7 @@
 		.red {color: #CC0000; }
 		.combination-name { font-weight: bold; cursor: pointer; text-decoration: underline; }
 		.combination-name:hover { text-decoration: none; }
+		.hint { color: grey; font-style: italic; }
 	</style>
 
 	<script type="text/javascript">
@@ -76,18 +77,34 @@
 </head>
 <body>
 	<form method="post">
-		<cfset tests = application.squabble.getGateway().getAllTests()>
+		<cfset tests = application.squabble.getGateway().getCategorisedTests()>
 
 		<strong>Choose Test:</strong>
 
-		<cfif arrayLen(tests)>
+		<cfif tests.total>
 			<select name="testName">
-				<cfloop array="#tests#" index="testName">
-					<cfoutput><option value="#testName#" <cfif structKeyExists(form, "testName") AND form.testName EQ testName>selected="selected"</cfif>>#testName#</option></cfoutput>
+				<cfloop list="#tests.order#" index="category">
+					<cfif arrayLen(tests[category])>
+						<optgroup label="<cfoutput>#category#</cfoutput>">
+							<cfloop array="#tests[category]#" index="test">
+								<cfset testName = structKeyList(test)>
+								<cfset isRecent = category EQ "Today" AND test[testName] GT dateAdd("h", -3, now())>
+								<cfoutput>
+									<option
+										value="#testName#"
+										<cfif structKeyExists(form, "testName") AND form.testName EQ testName>selected="selected"</cfif>
+										>#testName#<cfif isRecent>*</cfif>
+									</option>
+								</cfoutput>
+							</cfloop>
+						</optgroup>
+					</cfif>
 				</cfloop>
 			</select>
 
 			<input type="submit" value="Show Me" />
+			<br /><br />
+			<span class="hint">* Test has had a visitor in the last 3 hours</span>
 		<cfelse>
 			No Tests Recorded!
 		</cfif>

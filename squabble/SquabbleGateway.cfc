@@ -167,6 +167,7 @@
 	<cfquery name="getAllTestsQuery">
 		SELECT DISTINCT test_name
 		FROM squabble_visitors
+		ORDER BY visit_date
 	</cfquery>
 
 	<cfif getAllTestsQuery.recordcount GT 0>
@@ -174,6 +175,59 @@
 	</cfif>
 
 	<cfreturn testNameArray>
+</cffunction>
+
+
+<cffunction name="getAllTestsByLastVisit" hint="Retutns All Tests Ordered By The Last Visit" access="public" returntype="query" output="false">
+	<cfset var getAllTestsQuery = "">
+
+	<cfquery name="getAllTestsQuery">
+		SELECT DISTINCT test_name, MAX(visit_date) AS most_recent_visit
+		FROM squabble_visitors
+		GROUP BY test_name
+		ORDER BY visit_date DESC, test_name
+	</cfquery>
+
+	<cfreturn getAllTestsQuery>
+</cffunction>
+
+
+<cffunction name="getCategorisedTests" hint="Returns a categorised structure of tests" access="public" returntype="struct" output="false">
+	<cfset var tests = getAllTestsByLastVisit()>
+	<cfset var thisTest = "">
+
+	<cfset var categorised = structNew()>
+	<cfset categorised.total = 0>
+	<cfset categorised.order = "Today,Past Week,Past Month,Past Quarter,Past Year,Older">
+	<cfset categorised["Today"] = arrayNew(1)>
+	<cfset categorised["Past Week"] = arrayNew(1)>
+	<cfset categorised["Past Month"] = arrayNew(1)>
+	<cfset categorised["Past Quarter"] = arrayNew(1)>
+	<cfset categorised["Past Year"] = arrayNew(1)>
+	<cfset categorised["Older"] = arrayNew(1)>
+
+	<cfloop query="tests">
+		<cfset thisTest = structNew()>
+		<cfset thisTest[test_name] = most_recent_visit>
+
+		<cfif dateCompare(most_recent_visit, now(), "d") EQ 0>
+			<cfset arrayAppend(categorised["Today"], duplicate(thisTest))>
+		<cfelseif most_recent_visit GT dateAdd("d", -7, now())>
+			<cfset arrayAppend(categorised["Past Week"], duplicate(thisTest))>
+		<cfelseif most_recent_visit GT dateAdd("m", -1, now())>
+			<cfset arrayAppend(categorised["Past Month"], duplicate(thisTest))>
+		<cfelseif most_recent_visit GT dateAdd("m", -3, now())>
+			<cfset arrayAppend(categorised["Past Quarter"], duplicate(thisTest))>
+		<cfelseif most_recent_visit GT dateAdd("yyyy", -1, now())>
+			<cfset arrayAppend(categorised["Past Year"], duplicate(thisTest))>
+		<cfelse>
+			<cfset arrayAppend(categorised["Older"], duplicate(thisTest))>
+		</cfif>
+
+		<cfset categorised.total = categorised.total + 1>
+	</cfloop>
+
+	<cfreturn categorised>
 </cffunction>
 
 
