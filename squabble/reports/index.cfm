@@ -114,6 +114,7 @@
 				totalConversions = application.squabble.getGateway().getTotalConversions(form.testName);
 				conversions = totalConversions.recordcount EQ 1 AND totalConversions.total_conversions GT 0;
 				sections = application.squabble.getGateway().getTestSections(form.testName);
+				sectionCount = listLen(sections);
 			</cfscript>
 
 			<div id="testData">
@@ -173,16 +174,20 @@
 
 					<!--- Work out if we can measure against control --->
 					<cfset haveControl = false>
+					<cfset controlName = "">
+					<cfloop from="1" to="#sectionCount#" index="i">
+						<cfset controlName = listAppend(controlName, "control")>
+					</cfloop>
 
 					<cfquery name="controlVisitors" dbtype="query">
-						SELECT total_visitors FROM combinationTotalVisitors WHERE combination = 'control';
+						SELECT total_visitors FROM combinationTotalVisitors WHERE combination = <cfqueryparam cfsqltype="cf_sql_varchar" value="#controlName#">;
 					</cfquery>
 
 					<cfif controlVisitors.recordcount EQ 1 AND controlVisitors.total_visitors GT 0>
 						<cfset haveControl = true>
 
 						<cfquery name="controlConversions" dbtype="query">
-							SELECT total_conversions, total_value FROM combinationTotalConversions WHERE combination = 'control';
+							SELECT total_conversions, total_value FROM combinationTotalConversions WHERE combination = <cfqueryparam cfsqltype="cf_sql_varchar" value="#controlName#">;
 						</cfquery>
 
 						<cfset control = {
