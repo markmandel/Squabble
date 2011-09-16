@@ -56,6 +56,7 @@
 		.combination-name { font-weight: bold; cursor: pointer; text-decoration: underline; }
 		.combination-name:hover { text-decoration: none; }
 		.hint { color: grey; font-style: italic; }
+		.old { color: grey; }
 	</style>
 
 	<script type="text/javascript">
@@ -238,13 +239,29 @@
 								<cfscript>
 									goalCount++;
 									combinationVisitors = combinationTotalVisitors.total_visitors[combinationCount];
+									combinationLastVisit = combinationTotalVisitors.most_recent_visit[combinationCount];
 									combinationConversions = combinationTotalConversions.total_conversions[combinationCount];
 									combinationConversionTotal = combinationTotalConversions.total_value[combinationCount];
 									combinationUnitsTotal = combinationTotalConversions.total_units[combinationCount];
 									combinationConversionRate = decimalFormat(combinationConversions / combinationVisitors * 100);
+
+									isRecentCombination = combinationLastVisit GT dateAdd("h", -3, now());
+
+									// Row Class
+									combinationRowClass = "";
+
+									if (combinationCount MOD 2 EQ 0)
+									{
+										combinationRowClass = listAppend(combinationRowClass, "odd", " ");
+									}
+
+									if (!isRecentCombination)
+									{
+										combinationRowClass = listAppend(combinationRowClass, "old", " ");
+									}
 								</cfscript>
 
-								<tr <cfif combinationCount MOD 2 EQ 0>class="odd"</cfif>>
+								<tr class="#combinationRowClass#">
 									<cfif goalCount EQ 1>
 										<td rowspan="#totalGoals#">
 											<cfset combinationPreviewQS = "squabble_enable_preview=#form.testName#">

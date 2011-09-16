@@ -300,12 +300,14 @@
 	<cfquery name="getCombinationTotalVisitorsQuery">
 		SELECT
 			count(combinations.id) as total_visitors,
-			combinations.combination
+			combinations.combination,
+			combinations.most_recent_visit AS most_recent_visit
 		FROM
 		(
 			SELECT
 				squabble_visitors.id,
-				GROUP_CONCAT(squabble_combinations.variation_name ORDER BY squabble_combinations.section_name) AS combination
+				GROUP_CONCAT(squabble_combinations.variation_name ORDER BY squabble_combinations.section_name) AS combination,
+				MAX(squabble_visitors.visit_date) AS most_recent_visit
 			FROM
 				squabble_visitors
 				INNER JOIN
