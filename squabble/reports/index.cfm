@@ -278,9 +278,9 @@
 										<td rowspan="#totalGoals#">#combinationConversions#</td>
 										<td rowspan="#totalGoals#">#combinationConversionRate#%</td>
 										<td rowspan="#totalGoals#">
-											<cfif haveControl AND combination NEQ "control">
-												<cfset conversionRate = decimalFormat(combinationConversionRate - control.conversionRate)>
-												<span class="<cfif conversionRate GT 0>green<cfelse>red</cfif>"><cfif conversionRate GT 0>+</cfif>#conversionRate#%</span>
+											<cfif haveControl AND combination NEQ controlName>
+												<cfset conversionImprovement = decimalFormat(((combinationConversions / control.conversions) - 1) * 100)>
+												<span class="<cfif conversionImprovement GT 0>green<cfelse>red</cfif>"><cfif conversionImprovement GT 0>+</cfif>#conversionImprovement#%</span>
 											<cfelse>
 												NA
 											</cfif>
