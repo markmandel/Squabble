@@ -197,7 +197,7 @@
 							value = controlConversions.total_value
 						}>
 
-						<cfset control.conversionRate = decimalFormat(control.conversions / control.visitors * 100)>
+						<cfset control.conversionRate = decimalFormat(val(control.conversions) / control.visitors * 100)>
 					</cfif>
 
 					<table cellspacing="0">
