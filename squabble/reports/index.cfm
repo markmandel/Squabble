@@ -265,12 +265,17 @@
 									<cfif goalCount EQ 1>
 										<td rowspan="#totalGoals#">
 											<cfset combinationPreviewQS = "squabble_enable_preview=#form.testName#">
-											<cfset sectionCount = 0>
 
-											<cfloop list="#combination#" index="comboName">
-												<cfset sectionCount++>
-												<cfset combinationPreviewQS = listAppend(combinationPreviewQS, "squabble_#listGetAt(sections, sectionCount)#=#comboName#", "&")>
-											</cfloop>
+											<cfif sectionCount EQ 1>
+												<cfset combinationPreviewQS = listAppend(combinationPreviewQS, "squabble_#sections#=#combination#", "&")>
+											<cfelse>
+												<cfset s = 0>
+
+												<cfloop list="#combination#" index="comboName">
+													<cfset s++>
+													<cfset combinationPreviewQS = listAppend(combinationPreviewQS, "squabble_#listGetAt(sections, s)#=#comboName#", "&")>
+												</cfloop>
+											</cfif>
 
 											<a href="javascript:previewCombination('#combinationPreviewQS#')" class="combination-name">#combination#</a>
 										</td>
