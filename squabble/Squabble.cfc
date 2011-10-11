@@ -122,6 +122,12 @@
 	<cfargument name="section" hint="the name of the section to check if it is active" type="string" required="Yes">
 	<cfargument name="variation" hint="the name of the variation to check if it is active" type="string" required="Yes">
 	<cfscript>
+		//if disabled, then control is always active.
+		if(isTestDisabled(arguments.testname))
+		{
+			return arguments.variation eq "control";
+		}
+
 		var currentCombination = getCurrentCombination(arguments.testName);
 
 		if(!structKeyExists(currentCombination, arguments.section))
@@ -189,6 +195,17 @@
 <cffunction name="isTestDisabled" hint="Whether or not a given test is disabled" access="public" returntype="boolean" output="false">
 	<cfargument name="testname" hint="the name of the test potentially disabled." type="string" required="Yes">
 	<cfreturn structKeyExists(getDisabledTests(), arguments.testName) />
+</cffunction>
+
+<cffunction name="removeCombination" hint="If you want to remove a combination from the generated list. Handy if you want to remove it from the test altoghether, or for removing poorly performing combinations."
+			access="public" returntype="void" output="false">
+	<cfargument name="testname" hint="the name of the test to remove the combination from." type="string" required="Yes">
+	<cfargument name="combination" hint="the struct that represents the combination. Key is the section, value is the variation." type="struct" required="Yes">
+	<cfscript>
+		var combos = listTestCombinations(arguments.testName);
+
+		arrayDelete(combos, arguments.combination);
+    </cfscript>
 </cffunction>
 
 <cffunction name="getCurrentVisitorID" hint="get the current visitor ID" access="public" returntype="string" output="false">
@@ -310,7 +327,7 @@
 			counter++;
 		}
 
-		//convert it over to a list, as it's easier for CF to process
+		//convert it over to a list, as it's easier for CF to process, and it passes by reference.
 		var list = createObject("java", "java.util.ArrayList").init(combinations);
 
 		structInsert(getTestCombinations(), arguments.testName, list);

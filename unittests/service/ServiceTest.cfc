@@ -242,6 +242,39 @@
 	</cftransaction>
 </cffunction>
 
+<cffunction name="testIsActiveVariationonDisabledTest" hint="test that the active variation always comes back false, if it" access="public" returntype="void" output="false">
+	<cftransaction>
+		<cfscript>
+			clearSquabbleCookies();
+
+			service.registerTest("foo", testConfig);
+			service.disableTest("foo");
+
+			service.runTest("foo");
+
+			//control should always be true
+			assertTrue(service.isActiveVariation("foo", "fooSection", "control"));
+			assertTrue(service.isActiveVariation("foo", "barSection", "control"));
+
+			//get out of the control section
+			for(var counter = 1; counter <= 5; counter++)
+			{
+				clearSquabbleCookies();
+				service.runTest("foo");
+			}
+
+			//control should always be true
+			assertTrue(service.isActiveVariation("foo", "fooSection", "control"));
+			assertTrue(service.isActiveVariation("foo", "barSection", "control"));
+
+			//something else shoudl be false
+			assertFalse(service.isActiveVariation("foo", "fooSection", "test2"));
+			assertFalse(service.isActiveVariation("foo", "barSection", "test5"));
+	    </cfscript>
+    	<cftransaction action="rollback" />
+	</cftransaction>
+</cffunction>
+
 <cffunction name="testRunVisitorInsertionTest" hint="Ensure the runTest methods correctly inserts the visitor to the database" access="public" returntype="void" output="false">
 	<cftransaction>
 		<cfscript>
@@ -455,6 +488,48 @@
 
 		<cftransaction action="rollback" />
 	</cftransaction>
+</cffunction>
+
+<cffunction name="testListTestCombinations" hint="test listing all combinations" access="public" returntype="void" output="false">
+	<cfscript>
+		service.registerTest("foo", testConfig);
+		var combos = service.listTestCombinations("foo");
+		debug(combos);
+		//4x4
+		assertEquals(16, ArrayLen(combos));
+
+		//easy way to make sure they are all different.
+		var set = createObject("java", "java.util.HashSet").init(combos);
+
+		assertEquals(16, set.size());
+    </cfscript>
+</cffunction>
+
+<cffunction name="testRemoveCombination" hint="test removal of a combination" access="public" returntype="void" output="false">
+	<cfscript>
+		service.registerTest("foo", testConfig);
+		var combos = service.listTestCombinations("foo");
+		debug(combos);
+
+		//gate
+		assertEquals(16, ArrayLen(combos));
+
+		service.removeCombination("foo", {barsection="test5", foosection="test2"});
+
+		var combos = service.listTestCombinations("foo");
+
+		debug(combos);
+
+		assertEquals(15, ArrayLen(combos));
+
+		for(var combo in combos)
+		{
+			if(combo.barsection eq "test5" && combo.foosection eq "test2")
+			{
+				fail("bar: Test5, foo: test2 still exists!");
+			}
+		}
+	</cfscript>
 </cffunction>
 
 <!------------------------------------------- PACKAGE ------------------------------------------->
