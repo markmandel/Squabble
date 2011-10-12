@@ -21,11 +21,9 @@
 <cfparam name="attributes.squabble" type="any" default="" />
 
 <!--- If the Squabble service is passed in, use it... --->
-<cfif isObject(attributes.squabble)>
-	<cfset squabble = attributes.squabble />
-<!--- otherwise, it is expected to exist as the "squabble" key in the application scope. --->
-<cfelse>
-	<cfset squabble = application.squabble />
+<cfif !isObject(attributes.squabble)>
+	<!--- otherwise, it is expected to exist as the "squabble" key in the application scope. --->
+	<cfset attributes.squabble = application.squabble />
 </cfif>
 
 <!--- Whether or not to wrap the javascript snippet in script tags --->
