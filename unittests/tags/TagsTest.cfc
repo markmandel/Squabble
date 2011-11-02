@@ -209,7 +209,7 @@
 	<cfscript>
 		clearSquabbleCookies();
 
-		service.registerTest("foo", testConfig);
+		service.registerTest(testName="foo", variations=testConfig, options={gaSlot=1});
 	</cfscript>
 
 	<!--- test, not run yet --->
@@ -239,8 +239,8 @@
 		assertTrue(Find("</script>", local.script), "close script");
 
 		assertTrue(Find("_gaq", local.script), "_gaq should be there");
-		assertTrue(Find("_gaq.push(['_setCustomVar', 1, 'foo', 'BARSECTION:control, FOOSECTION:control', 1]);", local.script), "set custom var");
-		assertTrue(Find("_gaq.push(['_trackEvent', 'Squabble', 'Test: foo']);", local.script), "track event");
+		assertTrue(Find("pt._setCustomVar(1, 'foo', 'con,con', 1);", local.script), "set custom var");
+		assertTrue(Find("pt._trackEvent('Squabble', 'Test: foo', 'con,con', 1, false);", local.script), "track event");
     </cfscript>
 
 	<!--- no script tags --->
@@ -254,8 +254,8 @@
 		assertFalse(Find("</script>", local.script), "close script");
 
 		assertTrue(Find("_gaq", local.script), "_gaq should be there");
-		assertTrue(Find("_gaq.push(['_setCustomVar', 1, 'foo', 'BARSECTION:control, FOOSECTION:control', 1]);", local.script), "set custom var");
-		assertTrue(Find("_gaq.push(['_trackEvent', 'Squabble', 'Test: foo']);", local.script), "track event");
+		assertTrue(Find("pt._setCustomVar(1, 'foo', 'con,con', 1);", local.script), "set custom var");
+		assertTrue(Find("pt._trackEvent('Squabble', 'Test: foo', 'con,con', 1, false);", local.script), "track event");
     </cfscript>
 
 	<!--- no script tags, change in gaquq --->
@@ -270,13 +270,13 @@
 		assertFalse(Find("</script>", local.script), "close script");
 
 		assertFalse(Find("_gaq", local.script), "_gaq should not be there");
-		assertTrue(Find("gacv", local.script), "gacv should be there");
-		assertTrue(Find("gacv.push(['_setCustomVar', 1, 'foo', 'BARSECTION:control, FOOSECTION:control', 1]);", local.script), "set custom var");
-		assertTrue(Find("gacv.push(['_trackEvent', 'Squabble', 'Test: foo']);", local.script), "track event");
+		assertTrue(Find("gacv.push", local.script), "gacv should be there");
+		assertTrue(Find("pt._setCustomVar(1, 'foo', 'con,con', 1);", local.script), "set custom var");
+		assertTrue(Find("pt._trackEvent('Squabble', 'Test: foo', 'con,con', 1, false);", local.script), "track event");
     </cfscript>
 
     <!--- customVariableIndex --->
-	<cfsavecontent variable="local.script" >
+<!---	<cfsavecontent variable="local.script" >
 		<squabble:analytics squabble="#service#" customVariableIndex="3"/>
 	</cfsavecontent>
 
@@ -288,12 +288,12 @@
 
 		assertTrue(Find("_gaq", local.script), "_gaq should be there");
 		assertTrue(Find("_gaq.push(['_setCustomVar', 3, 'foo', 'BARSECTION:control, FOOSECTION:control', 1]);", local.script), "set custom var");
-		assertTrue(Find("_gaq.push(['_trackEvent', 'Squabble', 'Test: foo']);", local.script), "track event");
-    </cfscript>
+		assertTrue(Find("_gaq.push(['_trackEvent', 'Squabble', 'Test: foo', 'BARSECTION:control, FOOSECTION:control', 1, false]);", local.script), "track event");
+    </cfscript>--->
 
 	<!--- customVariableScope --->
 	<cfsavecontent variable="local.script" >
-		<squabble:analytics squabble="#service#" customVariableIndex="2" customVariableScope="3"/>
+		<squabble:analytics squabble="#service#" customVariableScope="3"/>
 	</cfsavecontent>
 
 	<cfscript>
@@ -303,13 +303,13 @@
 		assertTrue(Find("</script>", local.script), "close script");
 
 		assertTrue(Find("_gaq", local.script), "_gaq should be there");
-		assertTrue(Find("_gaq.push(['_setCustomVar', 2, 'foo', 'BARSECTION:control, FOOSECTION:control', 3]);", local.script), "set custom var");
-		assertTrue(Find("_gaq.push(['_trackEvent', 'Squabble', 'Test: foo']);", local.script), "track event");
+		assertTrue(Find("pt._setCustomVar(1, 'foo', 'con,con', 3);", local.script), "set custom var");
+		assertTrue(Find("pt._trackEvent('Squabble', 'Test: foo', 'con,con', 1, false);", local.script), "track event");
     </cfscript>
 
 	<!--- no tests --->
 	<cfsavecontent variable="local.script" >
-		<squabble:analytics squabble="#service#" customVariableIndex="2" customVariableScope="3" activeTests="#[]#"/>
+		<squabble:analytics squabble="#service#" customVariableScope="3" activeTests="#[]#"/>
 	</cfsavecontent>
 	<cfscript>
 		assertEquals("", trim(local.script));
@@ -334,6 +334,30 @@
 		assertTrue(Find("foo", local.script), "foo should be there");
 		assertFalse(Find("bar", local.script), "bar should not be there");
 	</cfscript>
+
+</cffunction>
+
+<cffunction name="multipleTestAnalytics" hint="test for multiple tests" access="public" returntype="void" output="false">
+	<cfscript>
+		clearSquabbleCookies();
+
+		service.registerTest(testName="foo", variations=testConfig, options={gaSlot=1});
+		service.registerTest(testName="bar", variations=testConfig, options={gaSlot=3});
+
+		service.runTest("foo");
+		service.runTest("bar");
+	</cfscript>
+
+	<cfsavecontent variable="local.script" >
+		<squabble:analytics squabble="#service#"/>
+	</cfsavecontent>
+
+	<cfscript>
+		debug(local.script);
+
+		assertTrue(Find("pt._setCustomVar(1, 'foo', 'con,con', 1);", local.script), "set custom var");
+		assertTrue(Find("pt._setCustomVar(3, 'bar', 'con,con', 1);", local.script), "set custom var");
+    </cfscript>
 
 </cffunction>
 

@@ -38,6 +38,7 @@
 			testname = "foo"
 			,variations = StructCopy(testConfig)
 			,percentageVisitorTraffic = 99
+			,options = {}
 		};
 
 		//add in control
@@ -69,6 +70,7 @@
 			testname = "foo"
 			,variations = StructCopy(testConfig)
 			,percentageVisitorTraffic = 99
+			,options={}
 		};
 
 		//add in control

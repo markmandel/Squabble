@@ -46,6 +46,8 @@
 			   	type="struct" required="Yes">
 	<cfargument name="percentageVisitorTraffic" hint="A percentage from 0 to 100 of the amount of visitor traffic should be included in this test. Defaults to 100 percent"
 			   type="numeric" required="No" default="100">
+	<cfargument name="options" hint="extra options to be added with this registration, to be used with other integration points, e.g. google analytics inegration"
+			   type="struct" required="no" default="#{}#">
 	<cfscript>
 		for(var section in arguments.variations)
 		{
