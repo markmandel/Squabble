@@ -407,7 +407,7 @@
 						visitorTotal += item.visitors;
 						conversionTotal += item.conversions;
 						valueTotal += val(item.value);
-						unitTotal = val(item.units);
+						unitTotal += val(item.units);
 
 						//take a snapshot at now.
 						item.visitorTotal = visitorTotal;
