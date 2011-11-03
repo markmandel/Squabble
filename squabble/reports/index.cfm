@@ -36,11 +36,24 @@
 <head>
 	<meta charset="utf-8" />
 	<title>Squabble Simple Report</title>
+
+	<!--[if lt IE 9]><script language="javascript" type="text/javascript" src="./js/jqPlot/excanvas.js"></script><![endif]-->
+	<script language="javascript" type="text/javascript" src="./js/jqPlot/jquery.min.js"></script>
+	<script language="javascript" type="text/javascript" src="./js/jqPlot/jquery.jqplot.min.js"></script>
+	<script type="text/javascript" language="javascript" src="./js/jqPlot/plugins/jqplot.dateAxisRenderer.js"></script>
+	<script type="text/javascript" language="javascript" src="./js/jqPlot/plugins/jqplot.canvasTextRenderer.js"></script>
+	<script type="text/javascript" language="javascript" src="./js/jqPlot/plugins/jqplot.canvasAxisLabelRenderer.js"></script>
+	<script language="javascript" type="text/javascript" src="./js/jqPlot/plugins/jqplot.cursor.min.js"></script>
+	<script language="javascript" type="text/javascript" src="./js/jqPlot/plugins/jqplot.highlighter.min.js"></script>
+	<script language="javascript" type="text/javascript" src="./js/jqPlot/plugins/jqplot.enhancedLegendRenderer.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="./js/jqPlot/jquery.jqplot.css" />
+
 	<style type="text/css">
 		* { margin: 0; padding: 0; font-family: inherit; }
 		html { height: 100%; width: 100%; }
 		body { margin: 20px; font-family: Ubuntu, Arial, Helvetica; font-size: 9pt; }
 		h2 { margin-bottom: 5px; }
+		h3 { margin-top: 10px; clear: both; }
 
 		#testData { margin-top: 20px; }
 		#testData table { margin-top: 15px; border: solid 1px #ccc; }
@@ -57,6 +70,11 @@
 		.combination-name:hover { text-decoration: none; }
 		.hint { color: grey; font-style: italic; }
 		.old { color: grey; }
+
+		#conversions, #value, #units {
+			height: 600px;
+			width: 100%;
+		}
 	</style>
 
 	<script type="text/javascript">
@@ -236,10 +254,13 @@
 							<cfoutput><cfset totalGoals++></cfoutput>
 
 							<cfoutput>
+								<cfquery name="comboVisitors" dbtype="query">
+									SELECT total_visitors, most_recent_visit FROM combinationTotalVisitors WHERE combination = <cfqueryparam cfsqltype="cf_sql_varchar" value="#combination#">;
+								</cfquery>
 								<cfscript>
 									goalCount++;
-									combinationVisitors = combinationTotalVisitors.total_visitors[combinationCount];
-									combinationLastVisit = combinationTotalVisitors.most_recent_visit[combinationCount];
+									combinationVisitors = comboVisitors.total_visitors;
+									combinationLastVisit = comboVisitors.most_recent_visit;
 									combinationConversions = combinationTotalConversions.total_conversions[combinationCount];
 									combinationConversionTotal = combinationTotalConversions.total_value[combinationCount];
 									combinationUnitsTotal = combinationTotalConversions.total_units[combinationCount];
@@ -316,6 +337,204 @@
 					</table>
 				</cfif>
 			</div>
+			<cfscript>
+				visitors = application.squabble.getGateway().getCombinationTotalVisitors(form.testName, "hour");
+				conversions = application.squabble.getGateway().getCombinationTotalConversions(form.testName, "hour");
+
+				data = createObject("java", "java.util.LinkedHashMap").init();
+            </cfscript>
+
+            <cfoutput query="visitors" group="combination">
+				<cfscript>
+					//keep the order
+					data[combination] = createObject("java", "java.util.LinkedHashMap").init();
+                </cfscript>
+
+				<cfoutput>
+					<cfscript>
+						key = dateformat(visitors.date, "yyyymmdd") & " " & visitors.unit & ":00";
+
+						item = { conversions = 0, units = 0, value = 0 };
+						item.hour = visitors.unit;
+						item.date = visitors.date;
+						item.visitors = visitors.total_visitors;
+
+						data[combination][key] = item;
+                    </cfscript>
+				</cfoutput>
+			</cfoutput>
+
+            <cfoutput query="conversions" group="combination">
+				<cfoutput>
+					<cfscript>
+						key = dateformat(conversions.date, "yyyymmdd") & " " & conversions.unit & ":00";
+
+						item = structKeyExists(data[combination], key) ? data[combination][key] : { visitors = 0 };
+
+						item.hour = conversions.unit;
+						item.date = conversions.date;
+						item.conversions = conversions.total_conversions;
+						item.units = conversions.total_units;
+						item.value = conversions.total_value;
+
+						data[combination][key] = item;
+                    </cfscript>
+				</cfoutput>
+			</cfoutput>
+
+			<!--- now we process it, and calculate totals --->
+			<cfscript>
+				for(combination in data)
+				{
+					combo = data[combination];
+					visitorTotal = 0;
+					conversionTotal = 0;
+					valueTotal = 0;
+					unitTotal = 0;
+
+					for(date in combo)
+					{
+						item = combo[date];
+						visitorTotal += item.visitors;
+						conversionTotal += item.conversions;
+						valueTotal += val(item.value);
+						unitTotal = val(item.units);
+
+						//take a snapshot at now.
+						item.visitorTotal = visitorTotal;
+						item.conversionTotal = conversionTotal;
+						item.valueTotal = valueTotal;
+						item.unitTotal = unitTotal;
+
+						if(visitorTotal == 0)
+						{
+							item.conversionRate = 0;
+						}
+						else
+						{
+							item.conversionRate = (conversionTotal/visitorTotal) * 100;
+						}
+					}
+				}
+            </cfscript>
+
+			<cfoutput>
+			<script type="text/javascript">
+				$(document).ready(function(){
+					$.jqplot.config.enablePlugins = true;
+					var options =
+					{
+						legend:
+						{
+           					renderer: $.jqplot.EnhancedLegendRenderer,
+           					show:true,
+           					rendererOptions:{
+               					numberRows: 1
+           					},
+           					placement: 'outsideGrid',
+           					location: 's'
+							,labels:
+							[
+							<cfset i = 1>
+							<cfloop collection="#data#" item="combination">
+							<cfif i++ neq 1>,</cfif>'#JSStringFormat(combination)#'
+							</cfloop>
+							]
+						}
+						,axesDefaults:
+						{
+							autoscale: true
+						}
+						,axes:
+						{
+							xaxis:
+							{
+								label: "Date, Hourly Breakdown"
+								,renderer:$.jqplot.DateAxisRenderer
+								,tickOptions:{formatString:'%d %b %H:00'}
+						  	}
+							,yaxis:
+							{
+								label: "Conversion Percentage"
+								,labelRenderer: $.jqplot.CanvasAxisLabelRenderer
+								,labelOptions:
+								{
+									angle: 270
+								}
+								,min: 0
+							}
+						}
+						,cursor:{zoom:true}
+						,highlighter:{show:true}
+					};
+
+					<cfset counter = 1>
+					<cfset vars = "">
+				    <cfloop collection="#data#" item="combination">
+						<cfset vars =ListAppend(vars, "series#counter#")>
+						<cfset combo = data[combination]>
+						series#counter++# =
+						[
+							<cfset i = 1>
+							<cfloop collection="#combo#" item="date"><cfset item = combo[date]>
+							<cfif i++ neq 1>,</cfif>["#DateFormat(item.date, 'dd mmm yyyy')# #item.hour#:00", #item.conversionRate#]
+							</cfloop>
+						];
+					</cfloop>
+
+
+				    conv = $.jqplot('conversions', [#vars#], options);
+
+					<cfset vars = "">
+					<cfloop collection="#data#" item="combination">
+						<cfset vars =ListAppend(vars, "series#counter#")>
+						<cfset combo = data[combination]>
+						series#counter++# =
+						[
+							<cfset i = 1>
+							<cfloop collection="#combo#" item="date"><cfset item = combo[date]>
+							<cfif i++ neq 1>,</cfif>["#DateFormat(item.date, 'dd mmm yyyy')# #item.hour#:00", #item.valueTotal#]
+							</cfloop>
+						];
+					</cfloop>
+
+					options.axes.yaxis.label = "Total Value";
+					values = $.jqplot('value', [#vars#], options);
+
+					<cfset vars = "">
+					<cfloop collection="#data#" item="combination">
+						<cfset vars =ListAppend(vars, "series#counter#")>
+						<cfset combo = data[combination]>
+						series#counter++# =
+						[
+							<cfset i = 1>
+							<cfloop collection="#combo#" item="date"><cfset item = combo[date]>
+							<cfif i++ neq 1>,</cfif>["#DateFormat(item.date, 'dd mmm yyyy')# #item.hour#:00", #item.unitTotal#]
+							</cfloop>
+						];
+					</cfloop>
+
+					options.axes.yaxis.label = "Total Units";
+					units = $.jqplot('units', [#vars#], options);
+
+				  });
+			</script>
+			</cfoutput>
+
+		<h3>Conversion Rate Per Hour</h3>
+		<div id="conversions" ></div>
+		<div><button value="reset" type="button" onclick="conv.resetZoom();">Zoom Out</button></div>
+
+		<h3>Total Value Per Hour</h3>
+
+		<div id="value" ></div>
+		<div><button value="reset" type="button" onclick="values.resetZoom();">Zoom Out</button></div>
+
+		<h3>Total Units Per Hour</h3>
+
+		<div id="units" ></div>
+		<div><button value="reset" type="button" onclick="units.resetZoom();">Zoom Out</button></div>
+
 		<cfelseif structKeyExists(form, "fieldnames")>
 			<br /><br />No Test Data Found
 		</cfif>

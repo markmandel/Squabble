@@ -295,19 +295,31 @@
 
 <cffunction name="getCombinationTotalVisitors" hint="Returns a query of visitor totals per combination" access="public" returntype="query" output="false">
 	<cfargument name="testName" type="string" required="true" hint="The test name to return data for">
+	<cfargument name="unitGrouping" type="string" required="false" hint="Optional grouping for data by either 'hour' or 'minute'">
+
 	<cfset var getCombinationTotalVisitorsQuery = "">
 
 	<cfquery name="getCombinationTotalVisitorsQuery">
 		SELECT
-			count(combinations.id) as total_visitors,
-			combinations.combination,
-			combinations.most_recent_visit AS most_recent_visit
+			count(combinations.id) as total_visitors
+			,combinations.combination
+			<cfif StructKeyExists(arguments, "unitGrouping")>
+				,date(combinations.visit_date) as date
+				,#arguments.unitGrouping#(combinations.visit_date) as unit
+			<cfelse>
+				,combinations.most_recent_visit AS most_recent_visit
+			</cfif>
 		FROM
 		(
 			SELECT
 				squabble_visitors.id,
-				GROUP_CONCAT(squabble_combinations.variation_name ORDER BY squabble_combinations.section_name) AS combination,
-				MAX(squabble_visitors.visit_date) AS most_recent_visit
+				GROUP_CONCAT(squabble_combinations.variation_name ORDER BY squabble_combinations.section_name) AS combination
+				<cfif StructKeyExists(arguments, "unitGrouping")>
+					,squabble_visitors.visit_date
+				<cfelse>
+					<!--- Question: How come the MAX()? --->
+					,MAX(squabble_visitors.visit_date) AS most_recent_visit
+				</cfif>
 			FROM
 				squabble_visitors
 				INNER JOIN
@@ -318,14 +330,21 @@
 			GROUP BY squabble_visitors.id
 		) combinations
 		GROUP BY combination
+			<cfif StructKeyExists(arguments, "unitGrouping")>
+				,date, unit
+
+				ORDER BY
+				combination, date, unit
+			</cfif>
 	</cfquery>
 
 	<cfreturn getCombinationTotalVisitorsQuery>
 </cffunction>
 
-
 <cffunction name="getCombinationTotalConversions" hint="Returns a query of total conversions and value per combination" access="public" returntype="query" output="false">
 	<cfargument name="testName" type="string" required="true" hint="The test name to return data for">
+	<cfargument name="unitGrouping" type="string" required="false" hint="Optional grouping for data by either 'hour' or 'minute'">
+
 	<cfset var getCombinationTotalConversionsQuery = "">
 
 	<cfquery name="getCombinationTotalConversionsQuery">
@@ -334,6 +353,10 @@
 			SUM(squabble_conversions.conversion_value) AS total_value,
 			SUM(squabble_conversions.conversion_units) AS total_units,
 			combinations.combination
+			<cfif StructKeyExists(arguments, "unitGrouping")>
+				,date(squabble_conversions.conversion_date) as date
+				,#arguments.unitGrouping#(squabble_conversions.conversion_date) as unit
+			</cfif>
 		FROM
 		(
 			SELECT
@@ -354,6 +377,13 @@
 		ON squabble_conversions.visitor_id = combinations.id
 
 		GROUP BY combination
+			<cfif StructKeyExists(arguments, "unitGrouping")>
+				,date, unit
+
+				ORDER BY
+				combination, date, unit
+
+			</cfif>
 	</cfquery>
 
 	<cfreturn getCombinationTotalConversionsQuery>
@@ -362,6 +392,7 @@
 
 <cffunction name="getGoalTotalConversions" hint="Returns a query of total conversions and value per combination and goal" access="public" returntype="query" output="false">
 	<cfargument name="testName" type="string" required="true" hint="The test name to return data for">
+
 	<cfset var getGoalTotalConversionsQuery = "">
 
 	<cfquery name="getGoalTotalConversionsQuery">
@@ -396,7 +427,6 @@
 
 	<cfreturn getGoalTotalConversionsQuery>
 </cffunction>
-
 
 <!------------------------------------------- PACKAGE ------------------------------------------->
 
