@@ -14,13 +14,8 @@
    limitations under the License.
  ---><cfsilent>
 
-
 <!---
-	A very simple report output to screen for now.
-
-	TODO: 	Move template in custom tag wrappers
-			Add some styling to format the output nicely
-			Move Data structure into API call
+	A very simple report output to screen.
 --->
 
 <cfif structKeyExists(form, "fieldnames")>
@@ -64,8 +59,9 @@
 		td, th { text-align: center; padding: 6px 12px; }
 		.header { background-color: #ddd; }
 		.odd { background-color: #efefef;  }
-		.green {color: #00CC00; }
 		.red {color: #CC0000; }
+		.green {color: #00CC00; }
+		.blue {color: #0000CC; }
 		.combination-name { font-weight: bold; cursor: pointer; text-decoration: underline; }
 		.combination-name:hover { text-decoration: none; }
 		.hint { color: grey; font-style: italic; }
@@ -203,22 +199,25 @@
 					</cfquery>
 
 					<cfif controlVisitors.recordcount EQ 1 AND controlVisitors.total_visitors GT 0>
-						<cfset haveControl = true>
-
 						<cfquery name="controlConversions" dbtype="query">
 							SELECT total_conversions, total_value FROM combinationTotalConversions WHERE combination = <cfqueryparam cfsqltype="cf_sql_varchar" value="#controlName#">;
 						</cfquery>
 
-						<cfset control = {
-							visitors = controlVisitors.total_visitors,
-							conversions = controlConversions.total_conversions,
-							value = controlConversions.total_value
-						}>
+						<cfif controlConversions.recordcount>
+							<cfset haveControl = true>
 
-						<cfset control.conversionRate = decimalFormat(val(control.conversions) / control.visitors * 100)>
+							<cfset control = {
+								visitors = controlVisitors.total_visitors,
+								conversions = controlConversions.total_conversions,
+								value = controlConversions.total_value
+							}>
+
+							<cfset control.conversionRate = decimalFormat(val(control.conversions) / control.visitors * 100)>
+						</cfif>
 					</cfif>
 
-					<table cellspacing="0">
+					<table cellspacing="0" id="combinationTable">
+						<thead>
 						<tr class="header">
 							<th>Combination</th>
 							<th>Hits</th>
@@ -244,6 +243,8 @@
 								<th>Units Per Conv.</th>
 							</cfif>
 						</tr>
+						</thead>
+						<tbody>
 
 						<cfset combinationCount = 0>
 
@@ -253,35 +254,43 @@
 							<cfset totalGoals = 0>
 							<cfoutput><cfset totalGoals++></cfoutput>
 
+							<!--- Get the data for this specific combination --->
+							<cfquery name="comboVisitors" dbtype="query">
+								SELECT total_visitors, most_recent_visit FROM combinationTotalVisitors WHERE combination = <cfqueryparam cfsqltype="cf_sql_varchar" value="#combination#">;
+							</cfquery>
+
+							<cfquery name="comboConversions" dbtype="query">
+								SELECT total_conversions, total_value, total_units FROM combinationTotalConversions WHERE combination = <cfqueryparam cfsqltype="cf_sql_varchar" value="#combination#">;
+							</cfquery>
+
+							<cfscript>
+								combinationVisitors = comboVisitors.total_visitors;
+								combinationLastVisit = comboVisitors.most_recent_visit;
+								combinationConversions = comboConversions.total_conversions;
+								combinationConversionTotal = comboConversions.total_value;
+								combinationUnitsTotal = comboConversions.total_units;
+								combinationConversionRate = decimalFormat(combinationConversions / combinationVisitors * 100);
+
+								isRecentCombination = combinationLastVisit GT dateAdd("h", -3, now());
+
+								// Row Class
+								combinationRowClass = "";
+
+								if (combinationCount MOD 2 EQ 0)
+								{
+									combinationRowClass = listAppend(combinationRowClass, "odd", " ");
+								}
+
+								if (!isRecentCombination)
+								{
+									combinationRowClass = listAppend(combinationRowClass, "old", " ");
+								}
+							</cfscript>
+
 							<cfoutput>
-								<cfquery name="comboVisitors" dbtype="query">
-									SELECT total_visitors, most_recent_visit FROM combinationTotalVisitors WHERE combination = <cfqueryparam cfsqltype="cf_sql_varchar" value="#combination#">;
-								</cfquery>
 								<cfscript>
 									goalCount++;
-									combinationVisitors = comboVisitors.total_visitors;
-									combinationLastVisit = comboVisitors.most_recent_visit;
-									combinationConversions = combinationTotalConversions.total_conversions[combinationCount];
-									combinationConversionTotal = combinationTotalConversions.total_value[combinationCount];
-									combinationUnitsTotal = combinationTotalConversions.total_units[combinationCount];
-									combinationConversionRate = decimalFormat(combinationConversions / combinationVisitors * 100);
-
-									isRecentCombination = combinationLastVisit GT dateAdd("h", -3, now());
-
-									// Row Class
-									combinationRowClass = "";
-
-									if (combinationCount MOD 2 EQ 0)
-									{
-										combinationRowClass = listAppend(combinationRowClass, "odd", " ");
-									}
-
-									if (!isRecentCombination)
-									{
-										combinationRowClass = listAppend(combinationRowClass, "old", " ");
-									}
 								</cfscript>
-
 								<tr class="#combinationRowClass#">
 									<cfif goalCount EQ 1>
 										<td rowspan="#totalGoals#">
@@ -306,7 +315,7 @@
 										<td rowspan="#totalGoals#">
 											<cfif haveControl AND combination NEQ controlName>
 												<cfset conversionImprovement = decimalFormat(((combinationConversions / control.conversions) - 1) * 100)>
-												<span class="<cfif conversionImprovement GT 0>green<cfelse>red</cfif>"><cfif conversionImprovement GT 0>+</cfif>#conversionImprovement#%</span>
+												<span class="<cfif conversionImprovement GT 0>green<cfelseif conversionImprovement LT 0>red<cfelse>blue</cfif>"><cfif conversionImprovement GT 0>+</cfif>#conversionImprovement#%</span>
 											<cfelse>
 												NA
 											</cfif>
@@ -315,7 +324,7 @@
 										<td rowspan="#totalGoals#"><cfif isNumeric(combinationConversionTotal)>#decimalFormat(val(combinationConversionTotal) / combinationConversions)#<cfelse>NA</cfif></td>
 										<cfif val(totalConversions.total_units) GT 0>
 											<td rowspan="#totalGoals#">#val(combinationUnitsTotal)#</td>
-											<td rowspan="#totalGoals#"><cfif val(combinationUnitsTotal) GT 0>#combinationConversionTotal / combinationUnitsTotal#<cfelse>NA</cfif></td>
+											<td rowspan="#totalGoals#"><cfif val(combinationUnitsTotal) GT 0>#decimalFormat(combinationConversionTotal / combinationUnitsTotal)#<cfelse>NA</cfif></td>
 											<td rowspan="#totalGoals#"><cfif val(combinationConversions) GT 0 AND val(combinationUnitsTotal) GT 0>#decimalFormat(combinationUnitsTotal / combinationConversions)#<cfelse>NA</cfif></td>
 										</cfif>
 									</cfif>
@@ -333,7 +342,7 @@
 								</tr>
 							</cfoutput>
 						</cfoutput>
-
+						</tbody>
 					</table>
 				</cfif>
 			</div>
