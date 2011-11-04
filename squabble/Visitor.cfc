@@ -83,6 +83,20 @@
     </cfscript>
 </cffunction>
 
+<cffunction name="clearCombination" hint="clear out the combination for a given test" access="public" returntype="void" output="false">
+	<cfargument name="testname" hint="the name of the test to get the variations for." type="string" required="Yes">
+
+	<cfif hasCombination(arguments.testname)>
+		<cfscript>
+			var cookieKey = createTestCombinationCookieKey(arguments.testname);
+			var requestKey = getRequestScopeKey(arguments.testname);
+
+			structDelete(request, requestKey);
+        </cfscript>
+	</cfif>
+	<cfcookie name="#cookieKey#" value="" expires="183">
+</cffunction>
+
 <!------------------------------------------- PACKAGE ------------------------------------------->
 
 <!------------------------------------------- PRIVATE ------------------------------------------->
@@ -93,7 +107,7 @@
 	<cfargument name="testname" hint="the name of the test to deserialise" type="string" required="Yes">
 	<cfscript>
 		//store all our bits in a request scope variable.
-		var key = "squabble-" & arguments.testName;
+		var key = getRequestScopeKey(arguments.testName);
 		if(!StructKeyExists(request, key))
 		{
 			request[key] = deserializeJSON(cookie[createTestCombinationCookieKey(arguments.testName)]);
@@ -101,6 +115,11 @@
 
 		return request[key];
     </cfscript>
+</cffunction>
+
+<cffunction name="getRequestScopeKey" hint="create the request scope key for storing deserialised combos" access="private" returntype="string" output="false">
+	<cfargument name="testname" hint="the name of the test to deserialise" type="string" required="Yes">
+	<cfreturn "squabble-" & arguments.testName />
 </cffunction>
 
 <cffunction name="getPreviewCombination" hint="returns a preview combination" access="public" returntype="struct" output="false">

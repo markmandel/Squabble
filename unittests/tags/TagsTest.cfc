@@ -87,13 +87,7 @@
 <cffunction name="noSectionTest" hint="test tag functionality for a user whose cookie is missing a test section" access="public" returntype="void" output="false">
 	<cftransaction>
 		<cfscript>
-			//mock out the response we want
-			var visitor = mock(service.getVisitor());
-
-			visitor.isEnabled().returns(true);
-			visitor.hasCombination("foo").returns(true);
-			visitor.getCombination().returns({ barSection = "test4" });
-			service.setVisitor(visitor);
+			service.getVisitor().setCombination("foo", createUUID(),{ barSection = "test4" });
 
 			service.registerTest("foo", testConfig);
 			service.runTest("foo");

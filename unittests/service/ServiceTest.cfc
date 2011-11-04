@@ -534,6 +534,41 @@
 	</cfscript>
 </cffunction>
 
+<cffunction name="testResetDisabledCombination" hint="test that a combination that has already been set, gets reset after it gets disabled"
+			access="public" returntype="void" output="false">
+	<cfscript>
+		clearSquabbleCookies();
+		service.registerTest("foo", testConfig);
+
+		//make sure it's not on control
+		service.runTest("foo");
+		clearSquabbleCookies();
+		service.runTest("foo");
+		clearSquabbleCookies();
+		service.runTest("foo");
+
+		var combos = service.listTestCombinations("foo");
+		combos = duplicate(combos);
+
+		debug(service.getCurrentCombination("foo"));
+
+		var combo = {barsection="test5", foosection="control"};
+
+		assertEquals(combo, service.getCurrentCombination("foo"));
+
+		service.removeCombination("foo", combo);
+
+		var reget = service.listTestCombinations("foo");
+
+		//make sure remove works
+		assertNotEquals(reget, combos);
+
+		service.runTest("foo");
+
+		assertNotEquals(combo, service.getCurrentCombination("foo"));
+    </cfscript>
+</cffunction>
+
 <!------------------------------------------- PACKAGE ------------------------------------------->
 
 <!------------------------------------------- PRIVATE ------------------------------------------->
