@@ -9,16 +9,16 @@
 Callable
 </TITLE>
 
-<META NAME="keywords" CONTENT="squabble.concurrent.Callable interface">
+<META NAME="keywords" CONTENT="squabble.reports.mysql.concurrent.Callable interface">
 
 
 
-<LINK REL ="stylesheet" TYPE="text/css" HREF="../stylesheet.css" TITLE="Style">
+<LINK REL ="stylesheet" TYPE="text/css" HREF="../../../stylesheet.css" TITLE="Style">
 
 <SCRIPT type="text/javascript">
 function windowTitle()
 {
-    parent.document.title="Visitor";
+    parent.document.title="Gateway";
 }
 </SCRIPT>
 <NOSCRIPT>
@@ -41,7 +41,7 @@ function windowTitle()
 <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="3" SUMMARY="">
   <TR ALIGN="center" VALIGN="top">
 	
-	<TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../overview-summary.html"><FONT CLASS="NavBarFont1"><B>Overview</B></FONT></A>&nbsp;</TD>
+	<TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../overview-summary.html"><FONT CLASS="NavBarFont1"><B>Overview</B></FONT></A>&nbsp;</TD>
 	
 	<TD BGCOLOR="##EEEEFF" CLASS="NavBarCell1">    <A HREF="package-summary.html"><FONT CLASS="NavBarFont1"><B>Package</B></FONT></A>&nbsp;</TD>
   
@@ -63,7 +63,7 @@ Squabble</EM>
 
 <TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
 	
-	  <A HREF="../index.html?squabble/Visitor.html" target="_top"><B>FRAMES</B></A>  &nbsp;
+	  <A HREF="../../../index.html?squabble/reports/mysql/Gateway.html" target="_top"><B>FRAMES</B></A>  &nbsp;
 	
 </FONT></TD>
 
@@ -76,16 +76,16 @@ Squabble</EM>
 <!-- ======== START OF CLASS DATA ======== -->
 <H2>
 <FONT SIZE="-1">
-squabble</FONT>
+squabble.reports.mysql</FONT>
 <BR>
 
 Class
-Visitor</H2>
+Gateway</H2>
 
 
 
 <PRE>WEB-INF.cftags.component
-        <IMG SRC="../resources/inherit.gif" ALT="extended by ">squabble.Visitor
+        <IMG SRC="../../../resources/inherit.gif" ALT="extended by ">squabble.reports.mysql.Gateway
 </PRE>
 
 
@@ -96,14 +96,14 @@ Visitor</H2>
 
 
 
-<PRE>public class <B>Visitor</B>
+<PRE>public class <B>Gateway</B>
 <DT>extends WEB-INF.cftags.component</DT></PRE>
 </DT>
 </DL>
 
 
 <P>
-	Class that manages Visitor identity
+	Gateway method for mysql reporting
 <P>
 
 
@@ -123,7 +123,7 @@ Visitor</H2>
 	<TR BGCOLOR="white" CLASS="TableRowColor">
 	
 	<TD>
-		<CODE><B><A HREF="Visitor.html#init()">init</A></B>()</CODE>
+		<CODE><B><A HREF="Gateway.html#init()">init</A></B>()</CODE>
 	<BR>
 	
 		
@@ -145,100 +145,89 @@ Visitor</H2>
 
 <TR BGCOLOR="white" CLASS="TableRowColor">
 <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
-<CODE>&nbsp;void</CODE></FONT></TD>
-<TD><CODE><B><A HREF="Visitor.html#clearCombination()">clearCombination</A></B>(string testname)</CODE>
+<CODE>&nbsp;query</CODE></FONT></TD>
+<TD><CODE><B><A HREF="Gateway.html#getAllTestsByLastVisit()">getAllTestsByLastVisit</A></B>()</CODE>
 <BR>
 
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;clear out the combination for a given test 
-</TD>
-</TR>
-
-<TR BGCOLOR="white" CLASS="TableRowColor">
-<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
-<CODE>private&nbsp;string</CODE></FONT></TD>
-<TD><CODE><B><A HREF="Visitor.html#createTestCombinationCookieKey()">createTestCombinationCookieKey</A></B>(string testName)</CODE>
-<BR>
-
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;create the key for the cookie, that stores the current users variation and id 
-</TD>
-</TR>
-
-<TR BGCOLOR="white" CLASS="TableRowColor">
-<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
-<CODE>private&nbsp;struct</CODE></FONT></TD>
-<TD><CODE><B><A HREF="Visitor.html#deserialiseCombination()">deserialiseCombination</A></B>(string testname)</CODE>
-<BR>
-
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;deserialise the combination, and store it in a thread local object so it doesn't need to be deserialised on every call 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Retutns All Tests Ordered By The Last Visit 
 </TD>
 </TR>
 
 <TR BGCOLOR="white" CLASS="TableRowColor">
 <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
 <CODE>&nbsp;struct</CODE></FONT></TD>
-<TD><CODE><B><A HREF="Visitor.html#getCombination()">getCombination</A></B>(string testname)</CODE>
+<TD><CODE><B><A HREF="Gateway.html#getCategorisedTests()">getCategorisedTests</A></B>()</CODE>
 <BR>
 
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;get the current visitor combination 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns a categorised structure of tests 
+</TD>
+</TR>
+
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;query</CODE></FONT></TD>
+<TD><CODE><B><A HREF="Gateway.html#getCombinationTotalConversions()">getCombinationTotalConversions</A></B>(string testName, [string unitGrouping])</CODE>
+<BR>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns a query of total conversions and value per combination 
+</TD>
+</TR>
+
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;query</CODE></FONT></TD>
+<TD><CODE><B><A HREF="Gateway.html#getCombinationTotalVisitors()">getCombinationTotalVisitors</A></B>(string testName, [string unitGrouping])</CODE>
+<BR>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns a query of visitor totals per combination 
+</TD>
+</TR>
+
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;query</CODE></FONT></TD>
+<TD><CODE><B><A HREF="Gateway.html#getGoalTotalConversions()">getGoalTotalConversions</A></B>(string testName)</CODE>
+<BR>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns a query of total conversions and value per combination and goal 
 </TD>
 </TR>
 
 <TR BGCOLOR="white" CLASS="TableRowColor">
 <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
 <CODE>&nbsp;string</CODE></FONT></TD>
-<TD><CODE><B><A HREF="Visitor.html#getID()">getID</A></B>(string testname)</CODE>
+<TD><CODE><B><A HREF="Gateway.html#getTestSections()">getTestSections</A></B>(string testName)</CODE>
 <BR>
 
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;get the current visitor ID 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns an ordered list of sections for a given test 
 </TD>
 </TR>
 
 <TR BGCOLOR="white" CLASS="TableRowColor">
 <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
-<CODE>&nbsp;struct</CODE></FONT></TD>
-<TD><CODE><B><A HREF="Visitor.html#getPreviewCombination()">getPreviewCombination</A></B>()</CODE>
+<CODE>&nbsp;query</CODE></FONT></TD>
+<TD><CODE><B><A HREF="Gateway.html#getTotalConversions()">getTotalConversions</A></B>(string testName)</CODE>
 <BR>
 
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;returns a preview combination 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns a count of all conversions, revenue and units 
 </TD>
 </TR>
 
 <TR BGCOLOR="white" CLASS="TableRowColor">
 <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
-<CODE>private&nbsp;string</CODE></FONT></TD>
-<TD><CODE><B><A HREF="Visitor.html#getRequestScopeKey()">getRequestScopeKey</A></B>(string testname)</CODE>
+<CODE>&nbsp;numeric</CODE></FONT></TD>
+<TD><CODE><B><A HREF="Gateway.html#getTotalVisitors()">getTotalVisitors</A></B>(string testName)</CODE>
 <BR>
 
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;create the request scope key for storing deserialised combos 
-</TD>
-</TR>
-
-<TR BGCOLOR="white" CLASS="TableRowColor">
-<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
-<CODE>&nbsp;boolean</CODE></FONT></TD>
-<TD><CODE><B><A HREF="Visitor.html#hasCombination()">hasCombination</A></B>(string testname)</CODE>
-<BR>
-
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Whether or not the current visitor has been assigned an id and a combination yet 
-</TD>
-</TR>
-
-<TR BGCOLOR="white" CLASS="TableRowColor">
-<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
-<CODE>&nbsp;void</CODE></FONT></TD>
-<TD><CODE><B><A HREF="Visitor.html#setCombination()">setCombination</A></B>(string testname, string id, struct combination)</CODE>
-<BR>
-
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set the combination for the current visitor 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns a count of all visitors for a test 
 </TD>
 </TR>
 
@@ -303,134 +292,13 @@ Constructor
 </tr>
 </tbody></table>
 
-	<a name="clearCombination()"><!-- --></a><h3>
-	clearCombination</h3>
-	<code>public void <B>clearCombination</B>(string testname)</code>
+	<a name="getAllTestsByLastVisit()"><!-- --></a><h3>
+	getAllTestsByLastVisit</h3>
+	<code>public query <B>getAllTestsByLastVisit</B>()</code>
 
 	<dl>
 	<dd>
-	clear out the combination for a given test 
-	<p>
-	</p></dd>
-
-	
-	
-	<dl>
-	<dt><b>Parameters:</b></dt>
-	
-	<dd><code>testname</code> - the name of the test to get the variations for.</dd>
-	
-	</dl>
-	
-
-	</dd>
-	</dl>
-	<hr>
-
-	<a name="createTestCombinationCookieKey()"><!-- --></a><h3>
-	createTestCombinationCookieKey</h3>
-	<code>private string <B>createTestCombinationCookieKey</B>(string testName)</code>
-
-	<dl>
-	<dd>
-	create the key for the cookie, that stores the current users variation and id 
-	<p>
-	</p></dd>
-
-	
-	
-	<dl>
-	<dt><b>Parameters:</b></dt>
-	
-	<dd><code>testName</code> - the name of the test.</dd>
-	
-	</dl>
-	
-
-	</dd>
-	</dl>
-	<hr>
-
-	<a name="deserialiseCombination()"><!-- --></a><h3>
-	deserialiseCombination</h3>
-	<code>private struct <B>deserialiseCombination</B>(string testname)</code>
-
-	<dl>
-	<dd>
-	deserialise the combination, and store it in a thread local object so it doesn't need to be deserialised on every call.
-												<br/>Call this before calling getID() or getCombination() 
-	<p>
-	</p></dd>
-
-	
-	
-	<dl>
-	<dt><b>Parameters:</b></dt>
-	
-	<dd><code>testname</code> - the name of the test to deserialise</dd>
-	
-	</dl>
-	
-
-	</dd>
-	</dl>
-	<hr>
-
-	<a name="getCombination()"><!-- --></a><h3>
-	getCombination</h3>
-	<code>public struct <B>getCombination</B>(string testname)</code>
-
-	<dl>
-	<dd>
-	get the current visitor combination. If an inactive visitor, returns an empty struct. 
-	<p>
-	</p></dd>
-
-	
-	
-	<dl>
-	<dt><b>Parameters:</b></dt>
-	
-	<dd><code>testname</code> - the name of the test to get the variations for.</dd>
-	
-	</dl>
-	
-
-	</dd>
-	</dl>
-	<hr>
-
-	<a name="getID()"><!-- --></a><h3>
-	getID</h3>
-	<code>public string <B>getID</B>(string testname)</code>
-
-	<dl>
-	<dd>
-	get the current visitor ID 
-	<p>
-	</p></dd>
-
-	
-	
-	<dl>
-	<dt><b>Parameters:</b></dt>
-	
-	<dd><code>testname</code> - the name of the test to get the combinations for.</dd>
-	
-	</dl>
-	
-
-	</dd>
-	</dl>
-	<hr>
-
-	<a name="getPreviewCombination()"><!-- --></a><h3>
-	getPreviewCombination</h3>
-	<code>public struct <B>getPreviewCombination</B>()</code>
-
-	<dl>
-	<dd>
-	returns a preview combination 
+	Retutns All Tests Ordered By The Last Visit 
 	<p>
 	</p></dd>
 
@@ -441,13 +309,30 @@ Constructor
 	</dl>
 	<hr>
 
-	<a name="getRequestScopeKey()"><!-- --></a><h3>
-	getRequestScopeKey</h3>
-	<code>private string <B>getRequestScopeKey</B>(string testname)</code>
+	<a name="getCategorisedTests()"><!-- --></a><h3>
+	getCategorisedTests</h3>
+	<code>public struct <B>getCategorisedTests</B>()</code>
 
 	<dl>
 	<dd>
-	create the request scope key for storing deserialised combos 
+	Returns a categorised structure of tests 
+	<p>
+	</p></dd>
+
+	
+	
+
+	</dd>
+	</dl>
+	<hr>
+
+	<a name="getCombinationTotalConversions()"><!-- --></a><h3>
+	getCombinationTotalConversions</h3>
+	<code>public query <B>getCombinationTotalConversions</B>(string testName, [string unitGrouping])</code>
+
+	<dl>
+	<dd>
+	Returns a query of total conversions and value per combination 
 	<p>
 	</p></dd>
 
@@ -456,7 +341,9 @@ Constructor
 	<dl>
 	<dt><b>Parameters:</b></dt>
 	
-	<dd><code>testname</code> - the name of the test to deserialise</dd>
+	<dd><code>testName</code> - The test name to return data for</dd>
+	
+	<dd><code>unitGrouping</code> - Optional grouping for data by either 'hour' or 'minute'</dd>
 	
 	</dl>
 	
@@ -465,13 +352,13 @@ Constructor
 	</dl>
 	<hr>
 
-	<a name="hasCombination()"><!-- --></a><h3>
-	hasCombination</h3>
-	<code>public boolean <B>hasCombination</B>(string testname)</code>
+	<a name="getCombinationTotalVisitors()"><!-- --></a><h3>
+	getCombinationTotalVisitors</h3>
+	<code>public query <B>getCombinationTotalVisitors</B>(string testName, [string unitGrouping])</code>
 
 	<dl>
 	<dd>
-	Whether or not the current visitor has been assigned an id and a combination yet 
+	Returns a query of visitor totals per combination 
 	<p>
 	</p></dd>
 
@@ -480,7 +367,9 @@ Constructor
 	<dl>
 	<dt><b>Parameters:</b></dt>
 	
-	<dd><code>testname</code> - the name of the test we are looking at.</dd>
+	<dd><code>testName</code> - The test name to return data for</dd>
+	
+	<dd><code>unitGrouping</code> - Optional grouping for data by either 'hour' or 'minute'</dd>
 	
 	</dl>
 	
@@ -489,13 +378,13 @@ Constructor
 	</dl>
 	<hr>
 
-	<a name="setCombination()"><!-- --></a><h3>
-	setCombination</h3>
-	<code>public void <B>setCombination</B>(string testname, string id, struct combination)</code>
+	<a name="getGoalTotalConversions()"><!-- --></a><h3>
+	getGoalTotalConversions</h3>
+	<code>public query <B>getGoalTotalConversions</B>(string testName)</code>
 
 	<dl>
 	<dd>
-	set the combination for the current visitor 
+	Returns a query of total conversions and value per combination and goal 
 	<p>
 	</p></dd>
 
@@ -504,11 +393,79 @@ Constructor
 	<dl>
 	<dt><b>Parameters:</b></dt>
 	
-	<dd><code>testname</code> - the name of the test to get the combinations for.</dd>
+	<dd><code>testName</code> - The test name to return data for</dd>
 	
-	<dd><code>id</code> - the id to set</dd>
+	</dl>
 	
-	<dd><code>combination</code> - The combination to set</dd>
+
+	</dd>
+	</dl>
+	<hr>
+
+	<a name="getTestSections()"><!-- --></a><h3>
+	getTestSections</h3>
+	<code>public string <B>getTestSections</B>(string testName)</code>
+
+	<dl>
+	<dd>
+	Returns an ordered list of sections for a given test 
+	<p>
+	</p></dd>
+
+	
+	
+	<dl>
+	<dt><b>Parameters:</b></dt>
+	
+	<dd><code>testName</code> - The test name to return data for</dd>
+	
+	</dl>
+	
+
+	</dd>
+	</dl>
+	<hr>
+
+	<a name="getTotalConversions()"><!-- --></a><h3>
+	getTotalConversions</h3>
+	<code>public query <B>getTotalConversions</B>(string testName)</code>
+
+	<dl>
+	<dd>
+	Returns a count of all conversions, revenue and units 
+	<p>
+	</p></dd>
+
+	
+	
+	<dl>
+	<dt><b>Parameters:</b></dt>
+	
+	<dd><code>testName</code> - The test name to return data for</dd>
+	
+	</dl>
+	
+
+	</dd>
+	</dl>
+	<hr>
+
+	<a name="getTotalVisitors()"><!-- --></a><h3>
+	getTotalVisitors</h3>
+	<code>public numeric <B>getTotalVisitors</B>(string testName)</code>
+
+	<dl>
+	<dd>
+	Returns a count of all visitors for a test 
+	<p>
+	</p></dd>
+
+	
+	
+	<dl>
+	<dt><b>Parameters:</b></dt>
+	
+	<dd><code>testName</code> - The test name to return data for</dd>
 	
 	</dl>
 	
@@ -528,7 +485,7 @@ Constructor
 <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="3" SUMMARY="">
   <TR ALIGN="center" VALIGN="top">
 	
-	<TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../overview-summary.html"><FONT CLASS="NavBarFont1"><B>Overview</B></FONT></A>&nbsp;</TD>
+	<TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../overview-summary.html"><FONT CLASS="NavBarFont1"><B>Overview</B></FONT></A>&nbsp;</TD>
 	
 	<TD BGCOLOR="##EEEEFF" CLASS="NavBarCell1">    <A HREF="package-summary.html"><FONT CLASS="NavBarFont1"><B>Package</B></FONT></A>&nbsp;</TD>
   
@@ -550,7 +507,7 @@ Squabble</EM>
 
 <TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
 	
-	  <A HREF="../index.html?squabble/Visitor.html" target="_top"><B>FRAMES</B></A>  &nbsp;
+	  <A HREF="../../../index.html?squabble/reports/mysql/Gateway.html" target="_top"><B>FRAMES</B></A>  &nbsp;
 	
 </FONT></TD>
 

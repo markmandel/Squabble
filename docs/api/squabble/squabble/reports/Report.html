@@ -9,16 +9,16 @@
 Callable
 </TITLE>
 
-<META NAME="keywords" CONTENT="squabble.concurrent.Callable interface">
+<META NAME="keywords" CONTENT="squabble.reports.concurrent.Callable interface">
 
 
 
-<LINK REL ="stylesheet" TYPE="text/css" HREF="../stylesheet.css" TITLE="Style">
+<LINK REL ="stylesheet" TYPE="text/css" HREF="../../stylesheet.css" TITLE="Style">
 
 <SCRIPT type="text/javascript">
 function windowTitle()
 {
-    parent.document.title="SquabbleGateway";
+    parent.document.title="Report";
 }
 </SCRIPT>
 <NOSCRIPT>
@@ -41,7 +41,7 @@ function windowTitle()
 <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="3" SUMMARY="">
   <TR ALIGN="center" VALIGN="top">
 	
-	<TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../overview-summary.html"><FONT CLASS="NavBarFont1"><B>Overview</B></FONT></A>&nbsp;</TD>
+	<TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../overview-summary.html"><FONT CLASS="NavBarFont1"><B>Overview</B></FONT></A>&nbsp;</TD>
 	
 	<TD BGCOLOR="##EEEEFF" CLASS="NavBarCell1">    <A HREF="package-summary.html"><FONT CLASS="NavBarFont1"><B>Package</B></FONT></A>&nbsp;</TD>
   
@@ -63,7 +63,7 @@ Squabble</EM>
 
 <TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
 	
-	  <A HREF="../index.html?squabble/SquabbleGateway.html" target="_top"><B>FRAMES</B></A>  &nbsp;
+	  <A HREF="../../index.html?squabble/reports/Report.html" target="_top"><B>FRAMES</B></A>  &nbsp;
 	
 </FONT></TD>
 
@@ -76,16 +76,16 @@ Squabble</EM>
 <!-- ======== START OF CLASS DATA ======== -->
 <H2>
 <FONT SIZE="-1">
-squabble</FONT>
+squabble.reports</FONT>
 <BR>
 
 Class
-SquabbleGateway</H2>
+Report</H2>
 
 
 
 <PRE>WEB-INF.cftags.component
-        <IMG SRC="../resources/inherit.gif" ALT="extended by ">squabble.SquabbleGateway
+        <IMG SRC="../../resources/inherit.gif" ALT="extended by ">squabble.reports.Report
 </PRE>
 
 
@@ -96,14 +96,14 @@ SquabbleGateway</H2>
 
 
 
-<PRE>public class <B>SquabbleGateway</B>
+<PRE>public class <B>Report</B>
 <DT>extends WEB-INF.cftags.component</DT></PRE>
 </DT>
 </DL>
 
 
 <P>
-	Squabble Gateway
+	Service layer for report based queries
 <P>
 
 
@@ -123,7 +123,7 @@ SquabbleGateway</H2>
 	<TR BGCOLOR="white" CLASS="TableRowColor">
 	
 	<TD>
-		<CODE><B><A HREF="SquabbleGateway.html#init()">init</A></B>()</CODE>
+		<CODE><B><A HREF="Report.html#init()">init</A></B>()</CODE>
 	<BR>
 	
 		
@@ -145,56 +145,30 @@ SquabbleGateway</H2>
 
 <TR BGCOLOR="white" CLASS="TableRowColor">
 <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
-<CODE>&nbsp;query</CODE></FONT></TD>
-<TD><CODE><B><A HREF="SquabbleGateway.html#getVisitor()">getVisitor</A></B>(string visitorID)</CODE>
+<CODE>&nbsp;any</CODE></FONT></TD>
+<TD><CODE><B><A HREF="Report.html#GETGATEWAY()">GETGATEWAY</A></B>()</CODE>
 <BR>
 
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns a visitor record from the database 
 </TD>
 </TR>
 
 <TR BGCOLOR="white" CLASS="TableRowColor">
 <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
-<CODE>&nbsp;query</CODE></FONT></TD>
-<TD><CODE><B><A HREF="SquabbleGateway.html#getVisitorCombinations()">getVisitorCombinations</A></B>(string visitorID)</CODE>
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="Report.html#SETGATEWAY()">SETGATEWAY</A></B>(any gateway)</CODE>
 <BR>
 
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns a visitor query along with any combinations the visitor received 
 </TD>
 </TR>
 
 <TR BGCOLOR="white" CLASS="TableRowColor">
 <TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
-<CODE>&nbsp;query</CODE></FONT></TD>
-<TD><CODE><B><A HREF="SquabbleGateway.html#getVisitorConversions()">getVisitorConversions</A></B>(string visitorID)</CODE>
+<CODE>&nbsp;any</CODE></FONT></TD>
+<TD><CODE><B><A HREF="Report.html#onMissingMethod()">onMissingMethod</A></B>(string missingMethodName, struct missingMethodArguments)</CODE>
 <BR>
 
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns a query of conversions for a given visitor 
-</TD>
-</TR>
-
-<TR BGCOLOR="white" CLASS="TableRowColor">
-<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
-<CODE>&nbsp;string</CODE></FONT></TD>
-<TD><CODE><B><A HREF="SquabbleGateway.html#insertConversion()">insertConversion</A></B>(string visitorID, string name, [string value=''], [string units=''], [date conversionDate='[runtime expression]'])</CODE>
-<BR>
-
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Records a conversion for a visitor 
-</TD>
-</TR>
-
-<TR BGCOLOR="white" CLASS="TableRowColor">
-<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
-<CODE>&nbsp;string</CODE></FONT></TD>
-<TD><CODE><B><A HREF="SquabbleGateway.html#insertVisitor()">insertVisitor</A></B>(string testName, struct variationData, [date visitDate='[runtime expression]'])</CODE>
-<BR>
-
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Inserts a visitor to the database when they come across a test 
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Proxy methods down to the gateway 
 </TD>
 </TR>
 
@@ -259,13 +233,30 @@ Constructor
 </tr>
 </tbody></table>
 
-	<a name="getVisitor()"><!-- --></a><h3>
-	getVisitor</h3>
-	<code>public query <B>getVisitor</B>(string visitorID)</code>
+	<a name="GETGATEWAY()"><!-- --></a><h3>
+	GETGATEWAY</h3>
+	<code>public any <B>GETGATEWAY</B>()</code>
 
 	<dl>
 	<dd>
-	Returns a visitor record from the database 
+	
+	<p>
+	</p></dd>
+
+	
+	
+
+	</dd>
+	</dl>
+	<hr>
+
+	<a name="SETGATEWAY()"><!-- --></a><h3>
+	SETGATEWAY</h3>
+	<code>public void <B>SETGATEWAY</B>(any gateway)</code>
+
+	<dl>
+	<dd>
+	
 	<p>
 	</p></dd>
 
@@ -274,7 +265,7 @@ Constructor
 	<dl>
 	<dt><b>Parameters:</b></dt>
 	
-	<dd><code>visitorID</code> - ID of the visitor to return</dd>
+	<dd><code>gateway</code></dd>
 	
 	</dl>
 	
@@ -283,13 +274,13 @@ Constructor
 	</dl>
 	<hr>
 
-	<a name="getVisitorCombinations()"><!-- --></a><h3>
-	getVisitorCombinations</h3>
-	<code>public query <B>getVisitorCombinations</B>(string visitorID)</code>
+	<a name="onMissingMethod()"><!-- --></a><h3>
+	onMissingMethod</h3>
+	<code>public any <B>onMissingMethod</B>(string missingMethodName, struct missingMethodArguments)</code>
 
 	<dl>
 	<dd>
-	Returns a visitor query along with any combinations the visitor received 
+	Proxy methods down to the gateway. 
 	<p>
 	</p></dd>
 
@@ -298,91 +289,9 @@ Constructor
 	<dl>
 	<dt><b>Parameters:</b></dt>
 	
-	<dd><code>visitorID</code> - ID of the visitor to return combinations for</dd>
+	<dd><code>missingMethodName</code> - </dd>
 	
-	</dl>
-	
-
-	</dd>
-	</dl>
-	<hr>
-
-	<a name="getVisitorConversions()"><!-- --></a><h3>
-	getVisitorConversions</h3>
-	<code>public query <B>getVisitorConversions</B>(string visitorID)</code>
-
-	<dl>
-	<dd>
-	Returns a query of conversions for a given visitor 
-	<p>
-	</p></dd>
-
-	
-	
-	<dl>
-	<dt><b>Parameters:</b></dt>
-	
-	<dd><code>visitorID</code> - ID of the visitor to return conversions for</dd>
-	
-	</dl>
-	
-
-	</dd>
-	</dl>
-	<hr>
-
-	<a name="insertConversion()"><!-- --></a><h3>
-	insertConversion</h3>
-	<code>public string <B>insertConversion</B>(string visitorID, string name, [string value=''], [string units=''], [date conversionDate='[runtime expression]'])</code>
-
-	<dl>
-	<dd>
-	Records a conversion for a visitor 
-	<p>
-	</p></dd>
-
-	
-	
-	<dl>
-	<dt><b>Parameters:</b></dt>
-	
-	<dd><code>visitorID</code> - The visitor ID to record the conversion for</dd>
-	
-	<dd><code>name</code> - The name/type of this conversion</dd>
-	
-	<dd><code>value</code> - The value to record for this conversion</dd>
-	
-	<dd><code>units</code> - The unit value to record for this conversion</dd>
-	
-	<dd><code>conversionDate</code> - The date the conversion happened</dd>
-	
-	</dl>
-	
-
-	</dd>
-	</dl>
-	<hr>
-
-	<a name="insertVisitor()"><!-- --></a><h3>
-	insertVisitor</h3>
-	<code>public string <B>insertVisitor</B>(string testName, struct variationData, [date visitDate='[runtime expression]'])</code>
-
-	<dl>
-	<dd>
-	Inserts a visitor to the database when they come across a test 
-	<p>
-	</p></dd>
-
-	
-	
-	<dl>
-	<dt><b>Parameters:</b></dt>
-	
-	<dd><code>testName</code> - The test this visitor is being recorded for</dd>
-	
-	<dd><code>variationData</code> - A data structure of the Sections and Variation this customer will see</dd>
-	
-	<dd><code>visitDate</code> - First visit date/time of this visitor</dd>
+	<dd><code>missingMethodArguments</code> - </dd>
 	
 	</dl>
 	
@@ -402,7 +311,7 @@ Constructor
 <TABLE BORDER="0" CELLPADDING="0" CELLSPACING="3" SUMMARY="">
   <TR ALIGN="center" VALIGN="top">
 	
-	<TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../overview-summary.html"><FONT CLASS="NavBarFont1"><B>Overview</B></FONT></A>&nbsp;</TD>
+	<TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../overview-summary.html"><FONT CLASS="NavBarFont1"><B>Overview</B></FONT></A>&nbsp;</TD>
 	
 	<TD BGCOLOR="##EEEEFF" CLASS="NavBarCell1">    <A HREF="package-summary.html"><FONT CLASS="NavBarFont1"><B>Package</B></FONT></A>&nbsp;</TD>
   
@@ -424,7 +333,7 @@ Squabble</EM>
 
 <TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
 	
-	  <A HREF="../index.html?squabble/SquabbleGateway.html" target="_top"><B>FRAMES</B></A>  &nbsp;
+	  <A HREF="../../index.html?squabble/reports/Report.html" target="_top"><B>FRAMES</B></A>  &nbsp;
 	
 </FONT></TD>
 
