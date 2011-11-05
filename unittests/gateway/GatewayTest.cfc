@@ -41,6 +41,8 @@
 
 			assertTrue(getVisitor.recordcount EQ 1);
 			assertEquals(visitorID, getVisitor.id);
+			assertEquals("variationBar,variationFoo", getVisitor.flat_combination);
+
 
 			assertTrue(getVisitorCombinations.recordcount EQ 2);
 			assertEquals(visitorID, getVisitorCombinations.visitor_id[1]);

@@ -22,6 +22,11 @@
 	base = expandPath("../../../squabble");
 	path = expandPath("../../api/squabble");
 
+	if(directoryExists(path))
+	{
+		directoryDelete(path, true);
+	}
+
 	colddoc = createObject("component", "colddoc.ColdDoc").init();
 	strategy = createObject("component", "colddoc.strategy.api.HTMLAPIStrategy").init(path, "Squabble");
 	colddoc.setStrategy(strategy);

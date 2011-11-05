@@ -472,7 +472,9 @@
 		<cfscript>
 				clearSquabbleCookies();
 
-				var visitors = service.getGateway().getTotalVisitors("foo");
+				var report = new squabble.reports.Report();
+
+				var visitors = report.getTotalVisitors("foo");
 				var conversion = service.getGateway().getVisitorConversions("foo");
 
 				service.registerTest("foo", testConfig);
@@ -484,7 +486,7 @@
 				service.runTest("foo");
 				service.convert("foo", "PayPal Checkout");
 
-				assertEquals(visitors, service.getGateway().getTotalVisitors("foo"));
+				assertEquals(visitors, report.getTotalVisitors("foo"));
 				assertEquals(conversion, service.getGateway().getVisitorConversions("foo"));
         </cfscript>
 

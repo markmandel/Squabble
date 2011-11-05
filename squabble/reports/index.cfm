@@ -22,7 +22,7 @@
 	<cfparam name="form.testName" type="string" default="">
 
 	<cfscript>
-		totalVisitors = application.squabble.getGateway().getTotalVisitors(form.testName);
+		totalVisitors = application.report.getTotalVisitors(form.testName);
 	</cfscript>
 </cfif>
 
@@ -92,7 +92,7 @@
 </head>
 <body>
 	<form method="post">
-		<cfset tests = application.squabble.getGateway().getCategorisedTests()>
+		<cfset tests = application.report.getCategorisedTests()>
 
 		<strong>Choose Test:</strong>
 
@@ -126,9 +126,9 @@
 
 		<cfif structKeyExists(form, "fieldnames") AND totalVisitors GT 0>
 			<cfscript>
-				totalConversions = application.squabble.getGateway().getTotalConversions(form.testName);
+				totalConversions = application.report.getTotalConversions(form.testName);
 				conversions = totalConversions.recordcount EQ 1 AND totalConversions.total_conversions GT 0;
-				sections = application.squabble.getGateway().getTestSections(form.testName);
+				sections = application.report.getTestSections(form.testName);
 				sectionCount = listLen(sections);
 			</cfscript>
 
@@ -175,9 +175,9 @@
 
 				<cfif conversions>
 					<cfscript>
-						combinationTotalVisitors = application.squabble.getGateway().getCombinationTotalVisitors(form.testName);
-						combinationTotalConversions = application.squabble.getGateway().getCombinationTotalConversions(form.testName);
-						goalTotalConversions = application.squabble.getGateway().getGoalTotalConversions(form.testName);
+						combinationTotalVisitors = application.report.getCombinationTotalVisitors(form.testName);
+						combinationTotalConversions = application.report.getCombinationTotalConversions(form.testName);
+						goalTotalConversions = application.report.getGoalTotalConversions(form.testName);
 
 						/* Debug
 							writeDump(var=sections, expand=false)
@@ -195,12 +195,12 @@
 					</cfloop>
 
 					<cfquery name="controlVisitors" dbtype="query">
-						SELECT total_visitors FROM combinationTotalVisitors WHERE combination = <cfqueryparam cfsqltype="cf_sql_varchar" value="#controlName#">;
+						SELECT total_visitors FROM combinationTotalVisitors WHERE flat_combination = <cfqueryparam cfsqltype="cf_sql_varchar" value="#controlName#">;
 					</cfquery>
 
 					<cfif controlVisitors.recordcount EQ 1 AND controlVisitors.total_visitors GT 0>
 						<cfquery name="controlConversions" dbtype="query">
-							SELECT total_conversions, total_value FROM combinationTotalConversions WHERE combination = <cfqueryparam cfsqltype="cf_sql_varchar" value="#controlName#">;
+							SELECT total_conversions, total_value FROM combinationTotalConversions WHERE flat_combination = <cfqueryparam cfsqltype="cf_sql_varchar" value="#controlName#">;
 						</cfquery>
 
 						<cfif controlConversions.recordcount>
@@ -248,7 +248,7 @@
 
 						<cfset combinationCount = 0>
 
-						<cfoutput query="goalTotalConversions" group="combination">
+						<cfoutput query="goalTotalConversions" group="flat_combination">
 							<cfset combinationCount++>
 							<cfset goalCount = 0>
 							<cfset totalGoals = 0>
@@ -256,11 +256,11 @@
 
 							<!--- Get the data for this specific combination --->
 							<cfquery name="comboVisitors" dbtype="query">
-								SELECT total_visitors, most_recent_visit FROM combinationTotalVisitors WHERE combination = <cfqueryparam cfsqltype="cf_sql_varchar" value="#combination#">;
+								SELECT total_visitors, most_recent_visit FROM combinationTotalVisitors WHERE flat_combination = <cfqueryparam cfsqltype="cf_sql_varchar" value="#flat_combination#">;
 							</cfquery>
 
 							<cfquery name="comboConversions" dbtype="query">
-								SELECT total_conversions, total_value, total_units FROM combinationTotalConversions WHERE combination = <cfqueryparam cfsqltype="cf_sql_varchar" value="#combination#">;
+								SELECT total_conversions, total_value, total_units FROM combinationTotalConversions WHERE flat_combination = <cfqueryparam cfsqltype="cf_sql_varchar" value="#flat_combination#">;
 							</cfquery>
 
 							<cfscript>
@@ -301,19 +301,19 @@
 											<cfelse>
 												<cfset s = 0>
 
-												<cfloop list="#combination#" index="comboName">
+												<cfloop list="#flat_combination#" index="comboName">
 													<cfset s++>
 													<cfset combinationPreviewQS = listAppend(combinationPreviewQS, "squabble_#listGetAt(sections, s)#=#comboName#", "&")>
 												</cfloop>
 											</cfif>
 
-											<a href="javascript:previewCombination('#combinationPreviewQS#')" class="combination-name">#combination#</a>
+											<a href="javascript:previewCombination('#combinationPreviewQS#')" class="combination-name">#flat_combination#</a>
 										</td>
 										<td rowspan="#totalGoals#">#combinationVisitors#</td>
 										<td rowspan="#totalGoals#">#combinationConversions#</td>
 										<td rowspan="#totalGoals#">#combinationConversionRate#%</td>
 										<td rowspan="#totalGoals#">
-											<cfif haveControl AND combination NEQ controlName>
+											<cfif haveControl AND flat_combination NEQ controlName>
 												<cfset conversionImprovement = decimalFormat(((combinationConversions / control.conversions) - 1) * 100)>
 												<span class="<cfif conversionImprovement GT 0>green<cfelseif conversionImprovement LT 0>red<cfelse>blue</cfif>"><cfif conversionImprovement GT 0>+</cfif>#conversionImprovement#%</span>
 											<cfelse>
@@ -347,16 +347,16 @@
 				</cfif>
 			</div>
 			<cfscript>
-				visitors = application.squabble.getGateway().getCombinationTotalVisitors(form.testName, "hour");
-				conversions = application.squabble.getGateway().getCombinationTotalConversions(form.testName, "hour");
+				visitors = application.report.getCombinationTotalVisitors(form.testName, "hour");
+				conversions = application.report.getCombinationTotalConversions(form.testName, "hour");
 
 				data = createObject("java", "java.util.LinkedHashMap").init();
             </cfscript>
 
-            <cfoutput query="visitors" group="combination">
+            <cfoutput query="visitors" group="flat_combination">
 				<cfscript>
 					//keep the order
-					data[combination] = createObject("java", "java.util.LinkedHashMap").init();
+					data[flat_combination] = createObject("java", "java.util.LinkedHashMap").init();
                 </cfscript>
 
 				<cfoutput>
@@ -368,17 +368,17 @@
 						item.date = visitors.date;
 						item.visitors = visitors.total_visitors;
 
-						data[combination][key] = item;
+						data[flat_combination][key] = item;
                     </cfscript>
 				</cfoutput>
 			</cfoutput>
 
-            <cfoutput query="conversions" group="combination">
+            <cfoutput query="conversions" group="flat_combination">
 				<cfoutput>
 					<cfscript>
 						key = dateformat(conversions.date, "yyyymmdd") & " " & conversions.unit & ":00";
 
-						item = structKeyExists(data[combination], key) ? data[combination][key] : { visitors = 0 };
+						item = structKeyExists(data[flat_combination], key) ? data[flat_combination][key] : { visitors = 0 };
 
 						item.hour = conversions.unit;
 						item.date = conversions.date;
@@ -386,7 +386,7 @@
 						item.units = conversions.total_units;
 						item.value = conversions.total_value;
 
-						data[combination][key] = item;
+						data[flat_combination][key] = item;
                     </cfscript>
 				</cfoutput>
 			</cfoutput>

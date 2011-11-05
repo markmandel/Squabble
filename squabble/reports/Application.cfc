@@ -27,9 +27,9 @@
 
 <cffunction name="onApplicationStart" hint="runs when the application is initialized" access="public" returntype="void" output="false">
 	<cfscript>
-		import "squabble.*";
+		import "squabble.reports.*";
 
-		application.squabble = new Squabble();
+		application.report = new Report();
     </cfscript>
 </cffunction>
 
