@@ -50,6 +50,6 @@ set
 where 
 	squabble_visitors.id = temp_visitor_data.id
 	and
-	squabble_visitors.flat_combination is null;
+	squabble_visitors.flat_combination = '';
 
 drop table if exists temp_visitor_data ;
