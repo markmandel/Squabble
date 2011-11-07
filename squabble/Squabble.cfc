@@ -22,6 +22,7 @@
 <cfproperty name="gateway" type="any" hint="Data access gateway">
 <cfproperty name="visitor" type="any" hint="The visitor details">
 <cfproperty name="browser" type="any" hint="The browser details">
+<cfproperty name="baseRequestKey" type="string" hint="A unique key for caching in the request scope">
 
 <!------------------------------------------- PUBLIC ------------------------------------------->
 
@@ -35,6 +36,8 @@
 		setGateway(new SquabbleGateway());
 		setVisitor(new Visitor());
 		setBrowser(new util.Browser());
+
+		setBaseRequestKey("squabble-#createUUID()#");
 
 		return this;
 	</cfscript>
@@ -74,6 +77,19 @@
 			return;
 		}
 
+		//skip ignored visitors
+		var requestKey = arguments.testName & "-" & getBaseRequestKey();
+		if(structKeyExists(request, requestKey))
+		{
+			//clear any existing combination
+		if(getVisitor().hasCombination(arguments.testName))
+		{
+				getVisitor().clearCombination(arguments.testName);
+			}
+
+			return;
+		}
+
 		if(getVisitor().hasCombination(arguments.testName))
 		{
 			if(arrayContains(listTestCombinations(arguments.testName), getCurrentCombination(arguments.testName)))
@@ -81,7 +97,7 @@
 				return;
 			}
 
-			//if the test has been disabled, or if someone has messed with thier cookie, give them something new.
+			//if the test has been disabled, or if someone has messed with their cookie, give them something new.
 			getVisitor().clearCombination(arguments.testName);
 		}
 
@@ -244,6 +260,15 @@
 		}
 
 		return {};
+    </cfscript>
+</cffunction>
+
+<cffunction name="ignoreVisitor" hint="ignores a specific visitor for a test" access="public" returntype="void" output="false">
+	<cfargument name="testname" hint="the name of the test to for which the visitor will be ignored" type="string" required="Yes">
+	<cfscript>
+		var requestKey = arguments.testname & "-" & getBaseRequestKey();
+
+		request[requestKey] = true;
     </cfscript>
 </cffunction>
 
