@@ -70,6 +70,7 @@
 									if it doesn't exist."
 			access="public" returntype="void" output="false">
 	<cfargument name="testName" hint="the name of the test." type="string" required="Yes">
+	<cfargument name="customVariation" hint="a custom variation to set." type="struct" required="No" default="#structNew()#">
 	<cfscript>
 		//skip disabled
 		if(isTestDisabled(arguments.testname))
@@ -111,6 +112,12 @@
 		if(isVisitorInPercentage(arguments.testName))
 		{
 			var variation = getNextCombination(arguments.testName);
+
+			if (!structIsEmpty(arguments.customVariation))
+			{
+				variation = arguments.customVariation;
+			}
+
 			var id = getGateway().insertVisitor(arguments.testName, variation);
 		}
 		else
