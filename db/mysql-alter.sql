@@ -48,8 +48,8 @@ update
 set
 	squabble_visitors.flat_combination = temp_visitor_data.flat_combination
 where 
-	squabble_visitors.id = temp_visitor_data.id;
+	squabble_visitors.id = temp_visitor_data.id
 	and
-	squabble_visitors.flat_combination is null
+	squabble_visitors.flat_combination is null;
 
 drop table if exists temp_visitor_data ;
