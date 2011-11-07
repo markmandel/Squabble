@@ -297,7 +297,7 @@
 											<cfset combinationPreviewQS = "squabble_enable_preview=#form.testName#">
 
 											<cfif sectionCount EQ 1>
-												<cfset combinationPreviewQS = listAppend(combinationPreviewQS, "squabble_#sections#=#combination#", "&")>
+												<cfset combinationPreviewQS = listAppend(combinationPreviewQS, "squabble_#sections#=#flat_combination#", "&")>
 											<cfelse>
 												<cfset s = 0>
 
