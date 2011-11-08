@@ -233,6 +233,63 @@
 	<cfreturn getGoalTotalConversionsQuery>
 </cffunction>
 
+<cffunction name="getSectionConversions" hint="Get a per section breakdown for a given test" access="public" returntype="query" output="false">
+	<cfargument name="testName" type="string" required="true" hint="The test name to return data for"/>
+
+	<cfquery name="local.sectionConversions">
+		select
+			squabble_combinations.section_name
+			,squabble_combinations.variation_name
+			,COUNT(squabble_conversions.id) as total_conversions
+			,SUM(squabble_conversions.conversion_value) as total_value
+			,SUM(squabble_conversions.conversion_units) as total_units
+		from
+			squabble_conversions
+			inner join
+			squabble_visitors
+				on squabble_visitors.id = squabble_conversions.visitor_id
+			inner join
+			squabble_combinations
+				on squabble_visitors.id = squabble_combinations.visitor_id
+		where
+			squabble_visitors.test_name = <cfqueryparam value="#arguments.testName#" cfsqltype="cf_sql_varchar">
+		group by
+			squabble_combinations.section_name
+			,squabble_combinations.variation_name
+		order by
+			squabble_combinations.section_name
+			,squabble_combinations.variation_name
+	</cfquery>
+
+	<cfreturn local.sectionConversions/>
+</cffunction>
+
+<cffunction name="getSectionVisitors" hint="Get a per section breakdown for a given test" access="public" returntype="query" output="false">
+	<cfargument name="testName" type="string" required="true" hint="The test name to return data for"/>
+
+	<cfquery name="local.sectionConversions">
+		select
+			squabble_combinations.section_name
+			,squabble_combinations.variation_name
+			,COUNT(squabble_visitors.id) as total_visitors
+		from
+			squabble_visitors
+			inner join
+			squabble_combinations
+				on squabble_visitors.id = squabble_combinations.visitor_id
+		where
+			squabble_visitors.test_name = <cfqueryparam value="#arguments.testName#" cfsqltype="cf_sql_varchar">
+		group by
+			squabble_combinations.section_name
+			,squabble_combinations.variation_name
+		order by
+			squabble_combinations.section_name
+			,squabble_combinations.variation_name
+	</cfquery>
+
+	<cfreturn local.sectionConversions/>
+</cffunction>
+
 <!------------------------------------------- PACKAGE ------------------------------------------->
 
 <!------------------------------------------- PRIVATE ------------------------------------------->
