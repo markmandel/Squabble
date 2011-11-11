@@ -610,6 +610,61 @@
 	</cftransaction>
 </cffunction>
 
+<cffunction name="testVisitorTaggingIgnoresNonRunTag" hint="test creating tags on a visitor" access="public" returntype="void" output="false">
+	<cftransaction >
+	<cfscript>
+		clearSquabbleCookies();
+		var test = "foo";
+		service.registerTest(test, testConfig);
+
+		service.tagVisitor(test, "yoda,hansolo");
+		var tags = service.getVisitorTags(test);
+		assertEquals([], tags);
+    </cfscript>
+    	<cftransaction action="rollback" />
+	</cftransaction>
+</cffunction>
+
+<cffunction name="testVisitorAllTagging" hint="test creating tags on a visitor" access="public" returntype="void" output="false">
+	<cftransaction >
+	<cfscript>
+		clearSquabbleCookies();
+		var test = "foo";
+		service.registerTest(test, testConfig);
+
+		//do this so we have an ID
+		service.runTest(test);
+
+		debug(service.getCurrentVisitorID(test));
+
+		service.tagVisitorAll("yoda,hansolo");
+
+		var tags = service.getVisitorTags(test);
+
+		ArraySort(tags, "text");
+
+		assertEquals(["hansolo", "yoda"], tags);
+
+		//add an extra tag
+		service.tagVisitorAll("vader");
+		var tags = service.getVisitorTags(test);
+		assertEquals(["hansolo", "vader", "yoda"], tags);
+
+		//add a tag we already have
+		service.tagVisitorAll("vader");
+		var tags = service.getVisitorTags(test);
+		assertEquals(["hansolo", "vader", "yoda"], tags);
+
+		//add an extra tag we have and one we dont
+		service.tagVisitorAll(["vader", "c3po"]);
+		var tags = service.getVisitorTags(test);
+		assertEquals(["c3po", "hansolo", "vader", "yoda"], tags);
+    </cfscript>
+    	<cftransaction action="rollback" />
+	</cftransaction>
+</cffunction>
+
+
 <!------------------------------------------- PACKAGE ------------------------------------------->
 
 <!------------------------------------------- PRIVATE ------------------------------------------->

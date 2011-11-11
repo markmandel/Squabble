@@ -194,7 +194,7 @@
 		(visitor_id, tag_value)
 		VALUES
 		(
-			<cfqueryparam value="#arguments.visitorID#" cfsqltype="cf_sql_varchar">
+			<cfqueryparam cfsqltype="cf_sql_char" value="#arguments.visitorID#" maxlength="35">
 			, <cfqueryparam value="#arguments.tag#" cfsqltype="cf_sql_varchar">
 		)
 	</cfquery>

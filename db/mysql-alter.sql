@@ -24,7 +24,7 @@ CREATE  TABLE `squabble_visitor_tags` (
 	INDEX `fk_visitor_tag_visitor_id` (`visitor_id` ASC) ,
   CONSTRAINT `fk_visitor_tag_visitor_id`
     FOREIGN KEY (`visitor_id` )
-    REFERENCES `squabble`.`squabble_visitors` (`id` )
+    REFERENCES `squabble_visitors` (`id` )
     ON DELETE RESTRICT
     ON UPDATE RESTRICT  
 )
