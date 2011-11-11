@@ -83,8 +83,8 @@
 		if(structKeyExists(request, requestKey))
 		{
 			//clear any existing combination
-		if(getVisitor().hasCombination(arguments.testName))
-		{
+			if(getVisitor().hasCombination(arguments.testName))
+			{
 				getVisitor().clearCombination(arguments.testName);
 			}
 
@@ -279,11 +279,49 @@
     </cfscript>
 </cffunction>
 
+<cffunction name="tagVisitor" hint="Apply an arbitrary tag(s) to this visitor to track custom meta data against them" access="public" returntype="void" output="false">
+	<cfargument name="testname" hint="the name of the test to for which the visitor will be tagged" type="string" required="Yes">
+	<cfargument name="tag" hint="a string, list or array of values to tag against the visitor" type="any" required="Yes">
+	<cfscript>
+		if(isSimpleValue(arguments.tag))
+		{
+			arguments.tag = listToArray(arguments.tag);
+		}
+
+		var id = getCurrentVisitorID(arguments.testName);
+
+		var currentTags = getVisitorTags(arguments.testName, arguments.tag);
+
+		for(var item in arguments.tag)
+		{
+			if(!arrayContains(currentTags, item))
+			{
+				getGateway().insertVisitorTag(id, item);
+			}
+		}
+    </cfscript>
+</cffunction>
+
+<cffunction name="getVisitorTags" hint="get all, or some of the visitor tags" access="public" returntype="array" output="false">
+	<cfargument name="testname" hint="the name of the test to for which the visitor will be tagged" type="string" required="Yes">
+	<cfargument name="filter" hint="a string, list or array of tags specifically look for against the visitor" type="any" required="no" default="#[]#">
+	<cfscript>
+		var id = getCurrentVisitorID(arguments.testName);
+		var tagsQuery = getGateway().getVisitorTags(id, arguments.filter);
+		var tags = [];
+    </cfscript>
+    <cfloop query="tagsQuery">
+		<cfset arrayAppend(tags, tagsQuery.tag_value)>
+    </cfloop>
+
+    <cfreturn tags />
+</cffunction>
+
 <!------------------------------------------- PACKAGE ------------------------------------------->
 
 <!------------------------------------------- PRIVATE ------------------------------------------->
 
-<cffunction name="isVisitorInPercentage" hint="is the new visitor within the current percentage of visitors for this test" access="public" returntype="boolean" output="false">
+<cffunction name="isVisitorInPercentage" hint="is the new visitor within the current percentage of visitors for this test" access="private" returntype="boolean" output="false">
 	<cfargument name="testname" hint="the name of the test" type="string" required="Yes">
 	<cfscript>
 		var config = getTestConfig(arguments.testname);
@@ -317,7 +355,7 @@
 	</cflock>
 </cffunction>
 
-<cffunction name="calculateCombinations" hint="calculate all the combinations of a given test, into an array that can be looped through." access="public" returntype="void" output="false">
+<cffunction name="calculateCombinations" hint="calculate all the combinations of a given test, into an array that can be looped through." access="private" returntype="void" output="false">
 	<cfargument name="testName" hint="the name of the test." type="string" required="Yes">
 	<cfscript>
 		var config = getTestConfig(arguments.testName).variations;

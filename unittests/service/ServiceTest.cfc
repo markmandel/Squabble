@@ -571,6 +571,45 @@
     </cfscript>
 </cffunction>
 
+<cffunction name="testVisitorTagging" hint="test creating tags on a visitor" access="public" returntype="void" output="false">
+	<cftransaction >
+	<cfscript>
+		clearSquabbleCookies();
+		var test = "foo";
+		service.registerTest(test, testConfig);
+
+		//do this so we have an ID
+		service.runTest(test);
+
+		debug(service.getCurrentVisitorID(test));
+
+		service.tagVisitor(test, "yoda,hansolo");
+
+		var tags = service.getVisitorTags(test);
+
+		ArraySort(tags, "text");
+
+		assertEquals(["hansolo", "yoda"], tags);
+
+		//add an extra tag
+		service.tagVisitor(test, "vader");
+		var tags = service.getVisitorTags(test);
+		assertEquals(["hansolo", "vader", "yoda"], tags);
+
+		//add a tag we already have
+		service.tagVisitor(test, "vader");
+		var tags = service.getVisitorTags(test);
+		assertEquals(["hansolo", "vader", "yoda"], tags);
+
+		//add an extra tag we have and one we dont
+		service.tagVisitor("foo", ["vader", "c3po"]);
+		var tags = service.getVisitorTags(test);
+		assertEquals(["c3po", "hansolo", "vader", "yoda"], tags);
+    </cfscript>
+    	<cftransaction action="rollback" />
+	</cftransaction>
+</cffunction>
+
 <!------------------------------------------- PACKAGE ------------------------------------------->
 
 <!------------------------------------------- PRIVATE ------------------------------------------->

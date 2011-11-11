@@ -71,6 +71,22 @@ CREATE TABLE `squabble_conversions` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `squabble_visitor_tags`
+--
+
+DROP TABLE IF EXISTS `squabble_visitor_tags`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `squabble_visitor_tags` (
+  `visitor_id` char(35) NOT NULL,
+  `tag_value` varchar(500) NOT NULL,
+  PRIMARY KEY (`visitor_id`,`tag_value`),
+  KEY `fk_visitor_tag_visitor_id` (`visitor_id`),
+  CONSTRAINT `fk_visitor_tag_visitor_id` FOREIGN KEY (`visitor_id`) REFERENCES `squabble_visitors` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `squabble_visitors`
 --
 
@@ -97,4 +113,4 @@ CREATE TABLE `squabble_visitors` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2011-11-05 15:18:00
+-- Dump completed on 2011-11-11 14:53:28

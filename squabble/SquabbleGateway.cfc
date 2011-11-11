@@ -167,6 +167,39 @@
 	<cfreturn getVisitorConversionsQuery>
 </cffunction>
 
+<cffunction name="getVisitorTags" hint="get all, or some of the visitor tags" access="public" returntype="query" output="false">
+	<cfargument name="visitorID" type="string" required="true" hint="ID of the visitor to return tags for">
+	<cfargument name="filter" hint="a string, list or array of tags specifically look for against the visitor" type="array" required="true">
+
+	<cfquery name="local.tags">
+		SELECT tag_value
+		from
+			squabble_visitor_tags
+		WHERE
+			squabble_visitor_tags.visitor_id = <cfqueryparam cfsqltype="cf_sql_char" value="#arguments.visitorID#" maxlength="35">
+			<cfif !arrayIsEmpty(arguments.filter)>
+				AND
+				squabble_visitor_tags.tag_value IN ( <cfqueryparam value="#ArrayToList(arguments.filter)#" cfsqltype="cf_sql_varchar" list="true" > )
+			</cfif>
+	</cfquery>
+
+	<cfreturn local.tags />
+</cffunction>
+
+<cffunction name="insertVisitorTag" hint="insert a visitor tag" access="public" returntype="void" output="false">
+	<cfargument name="visitorID" type="string" required="true" hint="ID of the visitor to insert a tag for">
+	<cfargument name="tag" hint="the tag to insert" type="string" required="Yes">
+	<cfquery>
+		INSERT INTO	squabble_visitor_tags
+		(visitor_id, tag_value)
+		VALUES
+		(
+			<cfqueryparam value="#arguments.visitorID#" cfsqltype="cf_sql_varchar">
+			, <cfqueryparam value="#arguments.tag#" cfsqltype="cf_sql_varchar">
+		)
+	</cfquery>
+</cffunction>
+
 <!------------------------------------------- PACKAGE ------------------------------------------->
 
 <!------------------------------------------- PRIVATE ------------------------------------------->
