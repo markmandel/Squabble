@@ -291,6 +291,18 @@
 			return;
 		}
 
+		//if for whatever reason they don't have a combo, ignore them.
+		if(!getVisitor().hasCombination(arguments.testName))
+		{
+			return;
+		}
+
+		//or if they have been skipped over.
+		if(structIsEmpty(getCurrentCombination(arguments.testName)))
+		{
+			return;
+		}
+
 		if(isSimpleValue(arguments.tag))
 		{
 			arguments.tag = listToArray(arguments.tag);
@@ -353,7 +365,7 @@
 			return true;
 		}
 
-		return (config.percentageVisitorTraffic <= randRange(1, 100));
+		return (config.percentageVisitorTraffic >= randRange(1, 100));
     </cfscript>
 </cffunction>
 

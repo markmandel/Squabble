@@ -664,6 +664,45 @@
 	</cftransaction>
 </cffunction>
 
+<cffunction name="testTaggingIgnoredUser" hint="test tagging an ignore user" access="public" returntype="void" output="false">
+	<cftransaction >
+	<cfscript>
+		clearSquabbleCookies();
+		var test = "foo";
+		service.registerTest(test, testConfig);
+
+		service.ignoreVisitor(test);
+
+		service.runTest(test);
+
+		service.tagVisitor(test, "yoda,hansolo");
+		var tags = service.getVisitorTags(test);
+		assertEquals([], tags);
+    </cfscript>
+		<cftransaction action="rollback" />
+	</cftransaction>
+</cffunction>
+
+<cffunction name="testTaggingWhenNotInAPercetage" hint="test when not in a percentage" access="public" returntype="void" output="false">
+	<cftransaction >
+	<cfscript>
+		clearSquabbleCookies();
+		var test = "john";
+
+		service.registerTest(test, testConfig, 0);
+
+		service.runTest(test);
+
+		debug(service.getCurrentCombination(test));
+
+		service.tagVisitor(test, "yoda,hansolo");
+
+		var tags = service.getVisitorTags(test);
+		assertEquals([], tags);
+    </cfscript>
+		<cftransaction action="rollback" />
+	</cftransaction>
+</cffunction>
 
 <!------------------------------------------- PACKAGE ------------------------------------------->
 
