@@ -13,7 +13,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  --->
-<cfcomponent hint="Class that manages Visitor identity" output="false">
+<cfcomponent hint="Class that manages Visitor identity" output="false" accessors="true">
+
+<cfproperty name="hashRegistry">
 
 <cfscript>
 	//contants
@@ -31,9 +33,9 @@
 <!------------------------------------------- PUBLIC ------------------------------------------->
 
 <cffunction name="init" hint="Constructor" access="public" returntype="Visitor" output="false">
+	<cfargument name="hashRegistry" hint="the hash registry component" type="any" required="Yes">
 	<cfscript>
-		//don't do get/set functions just for performance for cookie names.
-		variables.cookieComboNames = {};
+		setHashRegistry(arguments.hashRegistry);
 
 		return this;
 	</cfscript>
@@ -42,7 +44,13 @@
 <cffunction name="hasCombination" hint="Whether or not the current visitor has been assigned an id and a combination yet" access="public" returntype="boolean" output="false">
 	<cfargument name="testname" hint="the name of the test we are looking at." type="string" required="Yes">
 	<cfscript>
-		var key = createTestCombinationCookieKey(arguments.testName);
+		//if no test, then no point in saying it's there.
+		if(!getHashRegistry().hasTest(arguments.testName))
+		{
+			return false;
+		}
+
+		var key = getHashRegistry().getTestHash(arguments.testName);
 
 		//have to do length, as deleting the cookie just makes the length 0.
 		return (structKeyExists(cookie, key) AND Len(cookie[key]));
@@ -68,7 +76,7 @@
 		};
     </cfscript>
 
-	<cfcookie name="#createTestCombinationCookieKey(arguments.testName)#" value="#serializeJSON(details)#" expires="183">
+	<cfcookie name="#getHashRegistry().getTestHash(arguments.testName)#" value="#serializeJSON(details)#" expires="183">
 </cffunction>
 
 <cffunction name="getCombination" hint="get the current visitor combination. If an inactive visitor, returns an empty struct." access="public" returntype="struct" output="false">
@@ -88,13 +96,27 @@
 
 	<cfif hasCombination(arguments.testname)>
 		<cfscript>
-			var cookieKey = createTestCombinationCookieKey(arguments.testname);
+			var cookieKey = getHashRegistry().getTestHash(arguments.testName);
 			var requestKey = getRequestScopeKey(arguments.testname);
 
 			structDelete(request, requestKey);
         </cfscript>
 	</cfif>
 	<cfcookie name="#cookieKey#" value="" expires="183">
+</cffunction>
+
+<cffunction name="removeUnlistedCookies" hint="Remove squabble cookie (a cookie starting with 's-') that doesn't have a test registered with it. This does not remove disabled tests."
+			access="public" returntype="void" output="false">
+	<cfscript>
+		var before = dateAdd("y" , -10, Now());
+    </cfscript>
+
+    <cfloop collection="#cookie#" item="local.key">
+		<cfif LCase(local.key).startsWith("s-") and !getHashRegistry().hasTestHash(local.key)>
+			<!--- kill it --->
+			<cfcookie name="#local.key#" value="" expires="#before#">
+		</cfif>
+    </cfloop>
 </cffunction>
 
 <!------------------------------------------- PACKAGE ------------------------------------------->
@@ -110,7 +132,7 @@
 		var key = getRequestScopeKey(arguments.testName);
 		if(!StructKeyExists(request, key))
 		{
-			request[key] = deserializeJSON(cookie[createTestCombinationCookieKey(arguments.testName)]);
+			request[key] = deserializeJSON(cookie[getHashRegistry().getTestHash(arguments.testName)]);
 		}
 
 		return request[key];
@@ -139,20 +161,6 @@
 		}
 
 		return combination;
-    </cfscript>
-</cffunction>
-
-<!--- cache em, so as not to be creating tons of strings all the time --->
-
-<cffunction name="createTestCombinationCookieKey" hint="create the key for the cookie, that stores the current users variation and id" access="private" returntype="string" output="false">
-	<cfargument name="testName" hint="the name of the test." type="string" required="Yes">
-	<cfscript>
-		if(!structKeyExists(cookieComboNames, arguments.testName))
-		{
-			cookieComboNames[arguments.testName] = "s-#hash(arguments.testName)#";
-		}
-
-		return cookieComboNames[arguments.testName];
     </cfscript>
 </cffunction>
 

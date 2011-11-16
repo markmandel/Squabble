@@ -277,6 +277,23 @@
 	</cftransaction>
 </cffunction>
 
+<cffunction name="testIsActiveVariationonMissingTest" hint="test that the active variation always comes back false, if it doesn't exist" access="public" returntype="void" output="false">
+	<cftransaction>
+		<cfscript>
+			clearSquabbleCookies();
+
+			//control should always be true
+			assertTrue(service.isActiveVariation("foo", "fooSection", "control"));
+			assertTrue(service.isActiveVariation("foo", "barSection", "control"));
+
+			//something else shoudl be false
+			assertFalse(service.isActiveVariation("foo", "fooSection", "test2"));
+			assertFalse(service.isActiveVariation("foo", "barSection", "test5"));
+	    </cfscript>
+    	<cftransaction action="rollback" />
+	</cftransaction>
+</cffunction>
+
 <cffunction name="testRunVisitorInsertionTest" hint="Ensure the runTest methods correctly inserts the visitor to the database" access="public" returntype="void" output="false">
 	<cftransaction>
 		<cfscript>
@@ -702,6 +719,61 @@
     </cfscript>
 		<cftransaction action="rollback" />
 	</cftransaction>
+</cffunction>
+
+<cffunction name="testRemoveUnlistedCookies" hint="test removal of unlisted cookies" access="public" returntype="void" output="false">
+	<cfscript>
+		clearSquabbleCookies();
+
+		var test1 = "foo";
+		var test2 = "bar";
+		service.registerTest(test1, testConfig);
+		service.registerTest(test2, testConfig);
+		service.runTest(test1);
+		service.runTest(test2);
+
+		var fooHash = service.getHashRegistry().getTestHash(test1);
+		var barHash = service.getHashRegistry().getTestHash(test2);
+
+		//gate
+		assertTrue(Len(cookie[barHash]) gt 0, "Cookie value for #test2#, #barHash# is valid");
+		assertTrue(Len(cookie[fooHash]) gt 0, "Cookie value for #test1#, #fooHash# is valid");
+
+		//should remove nothing
+		service.removeUnlistedCookies();
+
+		assertTrue(Len(cookie[fooHash]) gt 0, "Cookie value for #test1#, #fooHash# is valid");
+		assertTrue(Len(cookie[barHash]) gt 0, "Cookie value for #test2#, #barHash# is valid");
+
+		//start again, disable one
+		StructClear(request);
+		service = new Squabble();
+
+		service.registerTest(test1, testConfig);
+		service.registerTest(test2, testConfig);
+		service.runTest(test1);
+		service.runTest(test2);
+
+		service.disableTest(test2);
+
+		//should remove nothing
+		service.removeUnlistedCookies();
+
+		assertTrue(Len(cookie[fooHash]) gt 0, "Cookie value for #test1#, #fooHash# is valid");
+		assertTrue(Len(cookie[barHash]) gt 0, "Cookie value for #test2#, #barHash# is valid");
+
+		//now try again, and drop 1
+		StructClear(request);
+		service = new Squabble();
+
+		service.registerTest(test1, testConfig);
+		service.runTest(test1);
+
+		service.removeUnlistedCookies();
+
+		assertTrue(Len(cookie[fooHash]) gt 0, "Cookie value for #test1#, #fooHash# is valid");
+		assertTrue(Len(cookie[barHash]) eq 0, "Cookie value for #test2#, #barHash# is not empty");
+    </cfscript>
 </cffunction>
 
 <!------------------------------------------- PACKAGE ------------------------------------------->

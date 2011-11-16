@@ -22,6 +22,7 @@
 <cfproperty name="gateway" type="any" hint="Data access gateway">
 <cfproperty name="visitor" type="any" hint="The visitor details">
 <cfproperty name="browser" type="any" hint="The browser details">
+<cfproperty name="hashRegistry" type="any" hint="hash registry">
 <cfproperty name="baseRequestKey" type="string" hint="A unique key for caching in the request scope">
 
 <!------------------------------------------- PUBLIC ------------------------------------------->
@@ -33,8 +34,9 @@
 		setTestVariationPool({});
 		setDisabledTests({});
 
+		setHashRegistry(new HashRegistry());
 		setGateway(new SquabbleGateway());
-		setVisitor(new Visitor());
+		setVisitor(new Visitor(getHashRegistry()));
 		setBrowser(new util.Browser());
 
 		setBaseRequestKey("squabble-#createUUID()#");
@@ -63,6 +65,8 @@
 		structInsert(getTestVariationPool(), arguments.testName, 1);
 
 		calculateCombinations(arguments.testName);
+
+		getHashRegistry().registerTest(arguments.testName);
 	</cfscript>
 </cffunction>
 
@@ -150,8 +154,8 @@
 	<cfargument name="section" hint="the name of the section to check if it is active" type="string" required="Yes">
 	<cfargument name="variation" hint="the name of the variation to check if it is active" type="string" required="Yes">
 	<cfscript>
-		//if disabled, then control is always active.
-		if(isTestDisabled(arguments.testname))
+		//if disabled, or not there at all, then control is always active.
+		if(isTestDisabled(arguments.testname) || !getVisitor().hasCombination(arguments.testName))
 		{
 			return arguments.variation eq "control";
 		}
@@ -349,6 +353,14 @@
     </cfloop>
 
     <cfreturn tags />
+</cffunction>
+
+<cffunction name="removeUnlistedCookies" hint="Remove squabble cookie (a cookie starting with 's-') that doesn't have a test registered with it.
+			This does not remove disabled tests. Useful if you want to be aggressive on cookie cleanup."
+			access="public" returntype="void" output="false">
+	<cfscript>
+		getVisitor().removeUnlistedCookies();
+    </cfscript>
 </cffunction>
 
 <!------------------------------------------- PACKAGE ------------------------------------------->

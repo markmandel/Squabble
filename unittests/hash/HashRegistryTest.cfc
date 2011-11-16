@@ -19,39 +19,39 @@
 
 <cffunction name="setup" hint="setup" access="public" returntype="void" output="false">
 	<cfscript>
-		clearSquabbleCookies();
+		//clearSquabbleCookies();
 
 		hashRegistry = new squabble.HashRegistry();
-		visitor = new squabble.Visitor(hashRegistry);
     </cfscript>
 </cffunction>
 
-<cffunction name="testPreview" hint="test out the preview functionality" access="public" returntype="void" output="false">
+<cffunction name="testRegisterAndHasTestHash" hint="make sure the registratation and hash test works" access="public" returntype="void" output="false">
 	<cfscript>
-		id = createUUID();
-		combination = { foo = "bar"};
+		var testName = "My New Test";
 
-		//set this up
-		hashRegistry.registerTest("foo");
+		hashRegistry.registerTest(testName);
 
-		//gate
-		visitor.setCombination("foo", id, combination);
+		var hash = hashRegistry.getTestHash(testName);
 
-		assertEquals(id, visitor.getID("foo"));
-		assertTrue(combination.equals(visitor.getCombination("foo")));
+		debug(hash);
 
-		//shouldn't enable for this test
-		url.squabble_enable_preview = "bar";
-		assertTrue(combination.equals(visitor.getCombination("foo")));
+		assertTrue(hash.startsWith("s-"));
 
-		url.squabble_enable_preview = "foo";
-		assertTrue(structIsEmpty(visitor.getCombination("foo")));
+		assertTrue(hashRegistry.hasTestHash(hash));
 
-		url.squabble_bar = "foo";
-		var expected = { bar = "foo" };
+		assertFalse(hashRegistry.hasTestHash("fooBar!"));
+    </cfscript>
+</cffunction>
 
-		assertFalse(combination.equals(visitor.getCombination("foo")));
-		assertTrue(expected.equals(visitor.getCombination("foo")));
+<cffunction name="testRegisterAndHasTestname" hint="make sure the registratation and hash test works" access="public" returntype="void" output="false">
+	<cfscript>
+		var testName = "My New Test";
+
+		hashRegistry.registerTest(testName);
+
+		assertTrue(hashRegistry.hasTest(testName));
+
+		assertFalse(hashRegistry.hasTestHash("fooBar!"));
     </cfscript>
 </cffunction>
 
