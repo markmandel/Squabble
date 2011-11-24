@@ -97,6 +97,12 @@
 
 		if(getVisitor().hasCombination(arguments.testName))
 		{
+			//if they have been skipped over.
+			if(structIsEmpty(getCurrentCombination(arguments.testName)))
+			{
+				return;
+			}
+
 			if(arrayContains(listTestCombinations(arguments.testName), getCurrentCombination(arguments.testName)))
 			{
 				return;

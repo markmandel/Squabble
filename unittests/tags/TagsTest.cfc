@@ -87,9 +87,10 @@
 <cffunction name="noSectionTest" hint="test tag functionality for a user whose cookie is missing a test section" access="public" returntype="void" output="false">
 	<cftransaction>
 		<cfscript>
+			service.registerTest("foo", testConfig);
+
 			service.getVisitor().setCombination("foo", createUUID(),{ barSection = "test4" });
 
-			service.registerTest("foo", testConfig);
 			service.runTest("foo");
 
 			var expectedFooContent = "control content";
