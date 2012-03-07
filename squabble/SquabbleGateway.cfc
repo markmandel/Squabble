@@ -150,18 +150,28 @@
 
 <cffunction name="getVisitorConversions" hint="Returns a query of conversions for a given visitor" access="public" returntype="query" output="false">
 	<cfargument name="visitorID" type="string" required="true" hint="ID of the visitor to return conversions for">
-	<cfset var getVisitorConversionsQuery = "">
+	<cfargument name="includeTags" hint="do we include conversion tags?" type="boolean" required="false" default="false">
 
-	<cfquery name="getVisitorConversionsQuery">
-		SELECT 	v.id AS visitor_id, v.visit_date, v.test_name,
-				con.id AS conversion_id, con.conversion_date, con.conversion_name, con.conversion_value, con.conversion_units
+	<cfquery name="local.getVisitorConversionsQuery">
+		SELECT
+			v.id AS visitor_id, v.visit_date, v.test_name,
+			con.id AS conversion_id,
+			con.conversion_date, con.conversion_name, con.conversion_value, con.conversion_units
+			<cfif arguments.includeTags>
+			,cont.tag_name, cont.tag_value
+			</cfif>
 
-		FROM 	squabble_visitors v
+			FROM 	squabble_visitors v
+			INNER JOIN squabble_conversions con
+				ON con.visitor_id = v.id
 
-		JOIN 	squabble_conversions con
-		ON 		con.visitor_id = v.id
+			<cfif arguments.includeTags>
+			INNER JOIN squabble_conversion_tags cont
+				ON cont.conversion_id = con.id
+			</cfif>
 
-		WHERE 	v.id = <cfqueryparam cfsqltype="cf_sql_char" value="#arguments.visitorID#" maxlength="35">
+		WHERE v.id = <cfqueryparam value="#arguments.visitorID#" cfsqltype="cf_sql_varchar">
+
 	</cfquery>
 
 	<cfreturn getVisitorConversionsQuery>
@@ -195,6 +205,22 @@
 		VALUES
 		(
 			<cfqueryparam cfsqltype="cf_sql_char" value="#arguments.visitorID#" maxlength="35">
+			, <cfqueryparam value="#arguments.tag#" cfsqltype="cf_sql_varchar">
+		)
+	</cfquery>
+</cffunction>
+
+<cffunction name="insertConversionTag" hint="insert a conversion tag" access="public" returntype="void" output="false">
+	<cfargument name="conversionID" type="string" required="true" hint="ID of the conversion to insert the tag for">
+	<cfargument name="key" hint="the key for the tag to insert" type="string" required="Yes">
+	<cfargument name="tag" hint="the tag to insert" type="string" required="Yes">
+	<cfquery>
+		INSERT INTO	squabble_conversion_tags
+		(conversion_id, tag_name, tag_value)
+		VALUES
+		(
+			<cfqueryparam cfsqltype="cf_sql_char" value="#arguments.conversionID#" maxlength="35">
+			, <cfqueryparam value="#arguments.key#" cfsqltype="cf_sql_varchar">
 			, <cfqueryparam value="#arguments.tag#" cfsqltype="cf_sql_varchar">
 		)
 	</cfquery>

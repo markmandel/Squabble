@@ -20,6 +20,7 @@
 	<cfparam name="attributes.name" type="string" /> <!--- The name of the conversion. --->
 	<cfparam name="attributes.value" type="string" default="" /> <!--- The conversion revenue (optional). --->
 	<cfparam name="attributes.units" type="string" default="" /> <!--- The conversion unit amount (optional). --->
+	<cfparam name="attributes.tags" type="struct" default="#{}#" /> <!--- The tags for this conversion (optional). --->
 	<cfparam name="attributes.squabble" type="any" default="" /> <!--- The Squabble service (optional). --->
 
 	<cfif thisTag.executionMode eq "start">
@@ -33,7 +34,7 @@
 		</cfif>
 
 		<!--- Log the conversion, including the revenue attribute if it is numeric. --->
-		<cfset squabble.convert(attributes.test, attributes.name, attributes.value, attributes.units) />
+		<cfset squabble.convert(attributes.test, attributes.name, attributes.value, attributes.units, attributes.tags) />
 
 	</cfif>
 

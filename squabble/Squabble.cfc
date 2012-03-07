@@ -182,6 +182,7 @@
 	<cfargument name="name" hint="The name/type of this conversion" type="string" required="false" default="The name of this conversion">
 	<cfargument name="value" hint="The value to record for this conversion" type="string" required="false" default="">
 	<cfargument name="units" hint="The unit amount to record for this conversion" type="string" required="false" default="">
+	<cfargument name="tags" hint="An structure of key value pairs to tag the conversion. Key is the name, value is the value" type="struct" required="false" default="#{}#">
 	<cfscript>
 		//if for whatever reason they don't have an id, ignore them.
 		if(!getVisitor().hasCombination(arguments.testName))
@@ -195,14 +196,18 @@
 			return;
 		}
 
-
 		//or if they have been skipped over.
 		if(structIsEmpty(getCurrentCombination(arguments.testName)))
 		{
 			return;
 		}
 
-		getGateway().insertConversion(getCurrentVisitorID(arguments.testname), arguments.name, arguments.value, arguments.units);
+		var conversionID = getGateway().insertConversion(getCurrentVisitorID(arguments.testname), arguments.name, arguments.value, arguments.units);
+
+		for(var key in arguments.tags)
+		{
+			getGateway().insertConversionTag(conversionID, key, arguments.tags[key]);
+		}
 	</cfscript>
 </cffunction>
 
@@ -210,6 +215,7 @@
 	<cfargument name="name" hint="The name/type of this conversion" type="string" required="false" default="The name of this conversion">
 	<cfargument name="value" hint="The value to record for this conversion" type="string" required="false" default="">
 	<cfargument name="units" hint="The unit amount to record for this conversion" type="string" required="false" default="">
+	<cfargument name="tags" hint="An structure of key value pairs to tag the conversion. Key is the name, value is the value" type="struct" required="false" default="#{}#">
 	<cfscript>
 		var registeredTests = listTests();
 		var registeredTestCount = arrayLen(registeredTests);
@@ -217,7 +223,7 @@
 
 		for (i; i <= registeredTestCount; i++)
 		{
-			convert(registeredTests[i], arguments.name, arguments.value, arguments.units);
+			convert(registeredTests[i], arguments.name, arguments.value, arguments.units, arguments.tags);
 		}
 	</cfscript>
 </cffunction>

@@ -17,15 +17,9 @@
 	Squabble Database Create Script (MySQL with InnoDB)
 */
 
-CREATE  TABLE `squabble_visitor_tags` (
-  `visitor_id` CHAR(35) NOT NULL ,
+CREATE  TABLE `squabble_conversion_tags` (
+  `conversion_id` CHAR(35) NOT NULL ,
+  `tag_name` VARCHAR(200) NOT NULL ,
   `tag_value` VARCHAR(500) NOT NULL ,
-	PRIMARY KEY (`visitor_id`, `tag_value`)  ,
-	INDEX `fk_visitor_tag_visitor_id` (`visitor_id` ASC) ,
-  CONSTRAINT `fk_visitor_tag_visitor_id`
-    FOREIGN KEY (`visitor_id` )
-    REFERENCES `squabble_visitors` (`id` )
-    ON DELETE RESTRICT
-    ON UPDATE RESTRICT  
-)
-ENGINE = InnoDB;
+  PRIMARY KEY (`conversion_id`, `tag_name`, `tag_value`) ,
+  INDEX `squabble_conversion_tag_conversion_id` (`conversion_id` ASC) );

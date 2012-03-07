@@ -335,6 +335,50 @@
 	</cftransaction>
 </cffunction>
 
+<cffunction name="convertTestWithTag" hint="Ensures the convert method correctly inserts tags" access="public" returntype="void" output="false">
+	<cftransaction>
+		<cfscript>
+			clearSquabbleCookies();
+
+			service.registerTest("foo", testConfig);
+			service.runTest("foo");
+
+			service.convert(testName="foo", name="PayPal Checkout", value=12, tags={order= 1234});
+
+			var conversion = service.getGateway().getVisitorConversions(service.getCurrentVisitorID("foo"), true);
+
+			assertEquals(1, conversion.recordcount);
+			assertEquals("PayPal Checkout", conversion.conversion_name);
+			assertEquals(12, conversion.conversion_value);
+			assertEquals("order", conversion.tag_name);
+			assertEquals("1234", conversion.tag_value);
+		</cfscript>
+		<cftransaction action="rollback" />
+	</cftransaction>
+</cffunction>
+
+<cffunction name="convertAllTestWithTag" hint="Ensures the convert method correctly inserts tags" access="public" returntype="void" output="false">
+	<cftransaction>
+		<cfscript>
+			clearSquabbleCookies();
+
+			service.registerTest("foo", testConfig);
+			service.runTest("foo");
+
+			service.convertAll(name="PayPal Checkout", value=12, tags={order= 1234});
+
+			var conversion = service.getGateway().getVisitorConversions(service.getCurrentVisitorID("foo"), true);
+
+			assertEquals(1, conversion.recordcount);
+			assertEquals("PayPal Checkout", conversion.conversion_name);
+			assertEquals(12, conversion.conversion_value);
+			assertEquals("order", conversion.tag_name);
+			assertEquals("1234", conversion.tag_value);
+		</cfscript>
+		<cftransaction action="rollback" />
+	</cftransaction>
+</cffunction>
+
 <cffunction name="convertNoRunTest" hint="Clear everything, and run convert. It should not throw an error" access="public" returntype="void" output="false">
 	<cftransaction>
 		<cfscript>
