@@ -247,7 +247,7 @@
 							<td rowspan="#totalGoals#"><cfif isNumeric(combinationConversionTotal)>#decimalFormat(val(combinationConversionTotal) / combinationConversions)#<cfelse>NA</cfif></td>
 							<cfif val(totalConversions.total_units) GT 0>
 								<td rowspan="#totalGoals#">#val(combinationUnitsTotal)#</td>
-								<td rowspan="#totalGoals#"><cfif val(combinationUnitsTotal) GT 0>#decimalFormat(combinationConversionTotal / combinationUnitsTotal)#<cfelse>NA</cfif></td>
+								<td rowspan="#totalGoals#"><cfif val(combinationUnitsTotal) GT 0 AND val(combinationConversionTotal) gt 0>#decimalFormat(combinationConversionTotal / combinationUnitsTotal)#<cfelse>NA</cfif></td>
 								<td rowspan="#totalGoals#"><cfif val(combinationConversions) GT 0 AND val(combinationUnitsTotal) GT 0>#decimalFormat(combinationUnitsTotal / combinationConversions)#<cfelse>NA</cfif></td>
 							</cfif>
 						</cfif>
