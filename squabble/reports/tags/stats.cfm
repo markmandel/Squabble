@@ -146,7 +146,7 @@
 				<th>Hits</th>
 				<th>Conversions</th>
 				<th>Conv. Rate</th>
-				<th>% Improvment</th>
+				<th>% Improvement</th>
 				<th>Conv. Value</th>
 				<th>Avg Conv. Value</th>
 				<cfif val(totalConversions.total_units) GT 0>
