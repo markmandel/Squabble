@@ -28,6 +28,8 @@
 <!------------------------------------------- PUBLIC ------------------------------------------->
 
 <cffunction name="init" hint="Constructor" access="public" returntype="Squabble" output="false">
+	<cfargument name="datasource" type="string" required="false" default="squabble" />
+
 	<cfscript>
 		setTestConfigurations({});
 		setTestCombinations({});
@@ -35,7 +37,7 @@
 		setDisabledTests({});
 
 		setHashRegistry(new HashRegistry());
-		setGateway(new SquabbleGateway());
+		setGateway(new SquabbleGateway(datasource = arguments.datasource));
 		setVisitor(new Visitor(getHashRegistry()));
 		setBrowser(new util.Browser());
 

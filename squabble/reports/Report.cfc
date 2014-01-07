@@ -21,10 +21,12 @@
 <cfproperty name="gateway">
 
 <cffunction name="init" hint="Constructor" access="public" returntype="Report" output="false">
-	<cfdbinfo type="Version" name="local.dbinfo">
+	<cfargument name="datasource" type="string" required="false" default="squabble" />
+
+	<cfdbinfo datasource="#arguments.datasource#" type="Version" name="local.dbinfo">
 
 	<cfscript>
-		var gateway = createObject("component", "squabble.reports.#Lcase(local.dbinfo.database_productname)#.Gateway").init();
+		var gateway = createObject("component", "squabble.reports.#Lcase(local.dbinfo.database_productname)#.Gateway").init(argumentCollection = arguments);
 
 		setGateway(gateway);
 

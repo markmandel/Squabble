@@ -1,5 +1,5 @@
 <!---
-   Copyright 2011 Ezra Parker, Josh Wines, Mark Mandel
+   Copyright 2013 Brian Ghidinelli - http://www.ghidinelli.com http://twitter.com/ghidinelli
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
    limitations under the License.
  --->
 
-<cfcomponent hint="Gateway method for mysql reporting" output="false">
+<cfcomponent hint="Gateway method for postgresql reporting" output="false">
 
 <!------------------------------------------- PUBLIC ------------------------------------------->
 
@@ -72,7 +72,7 @@
 		SELECT DISTINCT test_name, MAX(visit_date) AS most_recent_visit
 		FROM squabble_visitors
 		GROUP BY test_name
-		ORDER BY visit_date DESC, test_name
+		ORDER BY most_recent_visit DESC, test_name
 	</cfquery>
 
 	<cfreturn getAllTestsQuery>
@@ -148,8 +148,8 @@
 			count(squabble_visitors.id) as total_visitors
 			,squabble_visitors.flat_combination
 			<cfif StructKeyExists(arguments, "unitGrouping")>
-				,date(squabble_visitors.visit_date) as date
-				,#arguments.unitGrouping#(squabble_visitors.visit_date) as unit
+				,date_trunc('day', squabble_visitors.visit_date) as date
+				,date_part ('#arguments.unitGrouping#', squabble_visitors.visit_date) as unit
 			<cfelse>
 				,MAX(squabble_visitors.visit_date) AS most_recent_visit
 			</cfif>
@@ -184,8 +184,8 @@
 			SUM(squabble_conversions.conversion_units) AS total_units,
 			squabble_visitors.flat_combination
 			<cfif StructKeyExists(arguments, "unitGrouping")>
-				,date(squabble_conversions.conversion_date) as date
-				,#arguments.unitGrouping#(squabble_conversions.conversion_date) as unit
+				,date_trunc('day', squabble_conversions.conversion_date) as date
+				,date_part ('#arguments.unitGrouping#', squabble_conversions.conversion_date) as unit
 			</cfif>
 		FROM
 			squabble_visitors
