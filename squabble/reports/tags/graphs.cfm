@@ -25,9 +25,9 @@
 <!--- the name of the test to show --->
 <cfparam name="attributes.testName">
 
+
 <cfsavecontent variable="js" >
 	<!--[if lt IE 9]><script language="javascript" type="text/javascript" src="//cdn.jsdelivr.net/excanvas/r3/excanvas.js"></script><![endif]-->
-	<script language="javascript" type="text/javascript" src="//cdn.jsdelivr.net/jquery/1.9.1/jquery-1.9.1.min.js"></script>
 	<script language="javascript" type="text/javascript" src="//cdn.jsdelivr.net/jqplot/1.0.8/jquery.jqplot.js"></script>
 	<script language="javascript" type="text/javascript" src="//cdn.jsdelivr.net/jqplot/1.0.8/plugins/jqplot.dateAxisRenderer.min.js"></script>
 	<script language="javascript" type="text/javascript" src="//cdn.jsdelivr.net/jqplot/1.0.8/plugins/jqplot.canvasTextRenderer.min.js"></script>
@@ -37,7 +37,7 @@
 	<script language="javascript" type="text/javascript" src="//cdn.jsdelivr.net/jqplot/1.0.8/plugins/jqplot.enhancedLegendRenderer.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/jqplot/1.0.8/jquery.jqplot.css" />
 </cfsavecontent>
-<cfhtmlhead text="#js#" >
+<cfhtmlhead text="#js#">
 
 <cfscript>
 	visitors = application.report.getCombinationTotalVisitors(attributes.testName, "hour");
