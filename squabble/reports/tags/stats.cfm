@@ -146,7 +146,7 @@
 				<th>Hits</th>
 				<th>Conversions</th>
 				<th>Conv. Rate</th>
-				<th>% Improvment</th>
+				<th>% Improvement</th>
 				<th>Conv. Value</th>
 				<th>Avg Conv. Value</th>
 				<cfif val(totalConversions.total_units) GT 0>
@@ -192,7 +192,7 @@
 					combinationConversions = comboConversions.total_conversions;
 					combinationConversionTotal = comboConversions.total_value;
 					combinationUnitsTotal = comboConversions.total_units;
-					combinationConversionRate = decimalFormat(combinationConversions / combinationVisitors * 100);
+					combinationConversionRate = numberFormat((combinationConversions / combinationVisitors) * 100, ".00");
 
 					isRecentCombination = combinationLastVisit GT dateAdd("h", -3, now());
 

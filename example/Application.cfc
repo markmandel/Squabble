@@ -18,7 +18,7 @@
 
 <cfscript>
 	this.name = "Squabble Demo Application";
-	this.datasource = "Squabble";
+	this.datasource = "squabble";
 
 	this.mappings["/squabble"] = expandPath("../squabble");
 </cfscript>
@@ -28,14 +28,14 @@
 	<cfscript>
 		import "squabble.*";
 
-		application.squabble = new Squabble();
+		application.squabble = new Squabble(datasource = this.datasource);
 
 		testConfig =
 			{
 				fooSection = [ "test1", "test2", "test3" ]
 				, barSection = [ "test4", "test5", "test6" ]
 			};
-
+	
 		application.squabble.registerTest("foo", testConfig);
     </cfscript>
 </cffunction>

@@ -18,7 +18,7 @@
 
 <cfscript>
 	this.name = "Squabble Reports";
-	this.datasource = "Squabble";
+	this.datasource = "squabble";
 
 	this.mappings["/squabble"] = expandPath("../");
 </cfscript>
@@ -29,7 +29,7 @@
 	<cfscript>
 		import "squabble.reports.*";
 
-		application.report = new Report();
+		application.report = new Report(datasource = this.datasource);
     </cfscript>
 </cffunction>
 

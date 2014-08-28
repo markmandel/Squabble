@@ -25,19 +25,19 @@
 <!--- the name of the test to show --->
 <cfparam name="attributes.testName">
 
+
 <cfsavecontent variable="js" >
-	<!--[if lt IE 9]><script language="javascript" type="text/javascript" src="./js/jqPlot/excanvas.js"></script><![endif]-->
-	<script language="javascript" type="text/javascript" src="./js/jqPlot/jquery.min.js"></script>
-	<script language="javascript" type="text/javascript" src="./js/jqPlot/jquery.jqplot.min.js"></script>
-	<script type="text/javascript" language="javascript" src="./js/jqPlot/plugins/jqplot.dateAxisRenderer.js"></script>
-	<script type="text/javascript" language="javascript" src="./js/jqPlot/plugins/jqplot.canvasTextRenderer.js"></script>
-	<script type="text/javascript" language="javascript" src="./js/jqPlot/plugins/jqplot.canvasAxisLabelRenderer.js"></script>
-	<script language="javascript" type="text/javascript" src="./js/jqPlot/plugins/jqplot.cursor.min.js"></script>
-	<script language="javascript" type="text/javascript" src="./js/jqPlot/plugins/jqplot.highlighter.min.js"></script>
-	<script language="javascript" type="text/javascript" src="./js/jqPlot/plugins/jqplot.enhancedLegendRenderer.min.js"></script>
-	<link rel="stylesheet" type="text/css" href="./js/jqPlot/jquery.jqplot.css" />
+	<!--[if lt IE 9]><script language="javascript" type="text/javascript" src="//cdn.jsdelivr.net/excanvas/r3/excanvas.js"></script><![endif]-->
+	<script language="javascript" type="text/javascript" src="//cdn.jsdelivr.net/jqplot/1.0.8/jquery.jqplot.js"></script>
+	<script language="javascript" type="text/javascript" src="//cdn.jsdelivr.net/jqplot/1.0.8/plugins/jqplot.dateAxisRenderer.min.js"></script>
+	<script language="javascript" type="text/javascript" src="//cdn.jsdelivr.net/jqplot/1.0.8/plugins/jqplot.canvasTextRenderer.min.js"></script>
+	<script language="javascript" type="text/javascript" src="//cdn.jsdelivr.net/jqplot/1.0.8/plugins/jqplot.canvasAxisLabelRenderer.min.js"></script>
+	<script language="javascript" type="text/javascript" src="//cdn.jsdelivr.net/jqplot/1.0.8/plugins/jqplot.cursor.min.js"></script>
+	<script language="javascript" type="text/javascript" src="//cdn.jsdelivr.net/jqplot/1.0.8/plugins/jqplot.highlighter.min.js"></script>
+	<script language="javascript" type="text/javascript" src="//cdn.jsdelivr.net/jqplot/1.0.8/plugins/jqplot.enhancedLegendRenderer.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/jqplot/1.0.8/jquery.jqplot.css" />
 </cfsavecontent>
-<cfhtmlhead text="#js#" >
+<cfhtmlhead text="#js#">
 
 <cfscript>
 	visitors = application.report.getCombinationTotalVisitors(attributes.testName, "hour");

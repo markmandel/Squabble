@@ -19,7 +19,10 @@
 <!------------------------------------------- PUBLIC ------------------------------------------->
 
 <cffunction name="init" hint="Constructor" access="public" returntype="SquabbleGateway" output="false">
+	<cfargument name="datasource" type="string" required="true" />
+
 	<cfscript>
+		variables.datasource = arguments.datasource;
 		return this;
 	</cfscript>
 </cffunction>
@@ -45,7 +48,7 @@
 
 	<cftransaction>
 		<!--- Insert Main Visitor Record --->
-		<cfquery>
+		<cfquery datasource="#variables.datasource#">
 			INSERT INTO squabble_visitors (
 				id,
 				visit_date,
@@ -62,7 +65,7 @@
 
 		<!--- Insert Combination(s) this user has been allocated --->
 		<cfloop collection="#arguments.variationData#" item="section">
-			<cfquery>
+			<cfquery datasource="#variables.datasource#">
 				INSERT INTO squabble_combinations (
 					id,
 					visitor_id,
@@ -87,7 +90,7 @@
 	<cfargument name="visitorID" type="string" required="true" hint="ID of the visitor to return">
 	<cfset var getVisitorQuery = "">
 
-	<cfquery name="getVisitorQuery">
+	<cfquery datasource="#variables.datasource#" name="getVisitorQuery">
 		SELECT id, visit_date, test_name, flat_combination
 		FROM squabble_visitors
 		WHERE id = <cfqueryparam cfsqltype="cf_sql_char" value="#arguments.visitorID#" maxlength="35">
@@ -101,7 +104,7 @@
 	<cfargument name="visitorID" type="string" required="true" hint="ID of the visitor to return combinations for">
 	<cfset var getVisitorCombinationsQuery = "">
 
-	<cfquery name="getVisitorCombinationsQuery">
+	<cfquery datasource="#variables.datasource#" name="getVisitorCombinationsQuery">
 		SELECT 	v.id AS visitor_id, v.visit_date, v.test_name,
 				com.id AS combination_id, com.section_name, com.variation_name
 
@@ -125,7 +128,7 @@
 	<cfargument name="conversionDate" type="date" required="false" default="#now()#" hint="The date the conversion happened">
 	<cfset var conversionID = createUUID()>
 
-	<cfquery>
+	<cfquery datasource="#variables.datasource#">
 		INSERT INTO squabble_conversions (
 			id,
 			visitor_id,
@@ -152,7 +155,7 @@
 	<cfargument name="visitorID" type="string" required="true" hint="ID of the visitor to return conversions for">
 	<cfargument name="includeTags" hint="do we include conversion tags?" type="boolean" required="false" default="false">
 
-	<cfquery name="local.getVisitorConversionsQuery">
+	<cfquery datasource="#variables.datasource#" name="local.getVisitorConversionsQuery">
 		SELECT
 			v.id AS visitor_id, v.visit_date, v.test_name,
 			con.id AS conversion_id,
@@ -181,7 +184,7 @@
 	<cfargument name="visitorID" type="string" required="true" hint="ID of the visitor to return tags for">
 	<cfargument name="filter" hint="a string, list or array of tags specifically look for against the visitor" type="array" required="true">
 
-	<cfquery name="local.tags">
+	<cfquery datasource="#variables.datasource#" name="local.tags">
 		SELECT tag_value
 		from
 			squabble_visitor_tags
@@ -199,7 +202,7 @@
 <cffunction name="insertVisitorTag" hint="insert a visitor tag" access="public" returntype="void" output="false">
 	<cfargument name="visitorID" type="string" required="true" hint="ID of the visitor to insert a tag for">
 	<cfargument name="tag" hint="the tag to insert" type="string" required="Yes">
-	<cfquery>
+	<cfquery datasource="#variables.datasource#">
 		INSERT INTO	squabble_visitor_tags
 		(visitor_id, tag_value)
 		VALUES
@@ -214,7 +217,7 @@
 	<cfargument name="conversionID" type="string" required="true" hint="ID of the conversion to insert the tag for">
 	<cfargument name="key" hint="the key for the tag to insert" type="string" required="Yes">
 	<cfargument name="tag" hint="the tag to insert" type="string" required="Yes">
-	<cfquery>
+	<cfquery datasource="#variables.datasource#">
 		INSERT INTO	squabble_conversion_tags
 		(conversion_id, tag_name, tag_value)
 		VALUES

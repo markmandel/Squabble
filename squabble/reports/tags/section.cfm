@@ -52,8 +52,8 @@
 			<tr class="header">
 				<th>Section</th>
 				<th>Variation</th>
-				<th>Hits</th>
 				<th>Conversions</th>
+				<th>Hits</th>
 				<th>Conversion Rate</th>
 				<th>Total Value</th>
 				<th>Average Value</th>
@@ -93,10 +93,10 @@
 								#variation_name#
 							</td>
 							<td>
-								#visitors.total_visitors#
+								#sectionConversions.total_conversions#
 							</td>
 							<td>
-								#sectionConversions.total_conversions#
+								#visitors.total_visitors#
 							</td>
 							<td>
 								<cfset percent = roundTo2Decimal(sectionConversions.total_conversions/visitors.total_visitors)>
