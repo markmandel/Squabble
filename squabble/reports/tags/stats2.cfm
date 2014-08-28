@@ -201,7 +201,7 @@
 					combinationConversions = comboConversions.total_conversions;
 					combinationConversionTotal = comboConversions.total_value;
 					combinationUnitsTotal = comboConversions.total_units;
-					combinationConversionRate = decimalFormat((combinationConversions / combinationVisitors) * 100);
+					combinationConversionRate = numberFormat((combinationConversions / combinationVisitors) * 100, ".00");
 
 					isRecentCombination = combinationLastVisit GT dateAdd("h", -3, now());
 
